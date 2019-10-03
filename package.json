@@ -5,7 +5,7 @@
 	"main": "index.js",
 	"scripts": {
 		"test": "echo \"Error: no test specified\" && exit 1",
-		"dev": "env-cmd node index.js",
+		"dev": "env-cmd nodemon index.js",
 		"lint": "eslint ."
 	},
 	"keywords": [],
