@@ -1,30 +1,28 @@
 /*
-	GET /api/v1/blog - get all blogs
-	POST /api/v1/blog - add a new blog
-	GET /api/v1/blog/:id - get the blog by id
-	PUT /api/v1/blog/:id - update the blog by id
-	DELETE /api/v1/blog/:id - delete the blog by id
+	GET /api/v1/users - get all users
+	POST /api/v1/users - add a new user
+	GET /api/v1/users/:id - get the user by id
+	PUT /api/v1/users/:id - update the user by id
+	DELETE /api/v1/users/:id - delete the user by id
 */
 
 const express = require('express')
 const router = express.Router()
 
-let blogs = [
+let users = [
 	{
 		id: '1',
-		title: 'Some title',
-		content: 'Some text',
-		author: 'John Doe',
-		publishedAt: 'Wednesday'
+		email: 'ddd@gmail.com',
+		firstName: 'Li',
+		lastName: 'Ju'
 	}
 ]
 
 // it works
 router.get('/', (req, res) => {
-	console.log('here')
 	res.status(200)
 	res.setHeader('Content-Type', 'application/json')
-	res.send(JSON.stringify(blogs))
+	res.send(JSON.stringify(users))
 })
 
 // it works
@@ -32,9 +30,7 @@ const jsonParser = express.json()
 router.post('/', jsonParser, (req, res) => {
 	if (!req.body) return res.sendStatus(400)
 	req.body.id = `i${(+new Date()).toString(16)}`
-	blogs.push(req.body)
-	res.status(200)
-	res.setHeader('Content-Type', 'application/json')
+	users.push(req.body)
 	res.json(req.body)
 })
 
@@ -43,7 +39,7 @@ router.get('/:id', (req, res) => {
 	if (!req.body) return res.sendStatus(400)
 	res.status(200)
 	res.setHeader('Content-Type', 'application/json')
-	res.send(JSON.stringify(blogs.find(x => x.id === req.params.id)))
+	res.send(JSON.stringify(users.find(x => x.id === req.params.id)))
 })
 
 // it works
@@ -52,13 +48,13 @@ router.delete('/:id', (req, res) => {
 	res.status(200)
 	res.setHeader('Content-Type', 'application/json')
 	let idx = null
-	for (let i = 0; i < blogs.length; i++) {
-		if (blogs[i].id === req.params.id) {
+	for (let i = 0; i < users.length; i++) {
+		if (users[i].id === req.params.id) {
 			idx = i
 			break
 		}
 	}
-	res.send(JSON.stringify(blogs[idx]))
-	blogs.splice(idx, 1)
+	res.send(JSON.stringify(users[idx]))
+	users.splice(idx, 1)
 })
 module.exports = router
