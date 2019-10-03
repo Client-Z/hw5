@@ -18,31 +18,43 @@ let users = [
 	}
 ]
 
-// it works
 router.get('/', (req, res) => {
 	res.status(200)
 	res.setHeader('Content-Type', 'application/json')
-	res.send(JSON.stringify(users))
+	res.send(JSON.stringify({ data: users }))
 })
 
-// it works
-const jsonParser = express.json()
-router.post('/', jsonParser, (req, res) => {
+router.post('/', (req, res) => {
 	if (!req.body) return res.sendStatus(400)
 	req.body.id = `i${(+new Date()).toString(16)}`
 	users.push(req.body)
-	res.json(req.body)
+	res.json({ data: req.body })
 })
 
-// it works
 router.get('/:id', (req, res) => {
 	if (!req.body) return res.sendStatus(400)
 	res.status(200)
 	res.setHeader('Content-Type', 'application/json')
-	res.send(JSON.stringify(users.find(x => x.id === req.params.id)))
+	res.send(JSON.stringify({ data: users.find(x => x.id === req.params.id) }))
 })
 
-// it works
+router.put('/:id', (req, res) => {
+	if (!req.body) return res.sendStatus(400)
+	res.status(200)
+	res.setHeader('Content-Type', 'application/json')
+	let idx = null
+	for (let i = 0; i < users.length; i++) {
+		if (users[i].id === req.params.id) {
+			idx = i
+			break
+		}
+	}
+	if (req.body.email) users[idx].email = req.body.email
+	if (req.body.firstName) users[idx].firstName = req.body.firstName
+	if (req.body.lastName) users[idx].lastName = req.body.lastName
+	res.send(JSON.stringify({ data: users[idx] }))
+})
+
 router.delete('/:id', (req, res) => {
 	if (!req.body) return res.sendStatus(400)
 	res.status(200)
@@ -54,7 +66,7 @@ router.delete('/:id', (req, res) => {
 			break
 		}
 	}
-	res.send(JSON.stringify(users[idx]))
+	res.send(JSON.stringify({ data: users[idx] }))
 	users.splice(idx, 1)
 })
 module.exports = router
