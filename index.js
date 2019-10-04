@@ -5,23 +5,18 @@ const app = express()
 app.use(express.urlencoded({ extended: true, limit: '1mb' }))
 app.use(express.json())
 
+// eslint-disable-next-line no-unused-vars
+const routes = require('./routes')(app)
+
 app.use((req, res, next) => {
 	const error = new Error('Not found')
 	error.status = 404
 	next(error)
 })
-
 app.use((error, req, res, next) => {
 	res.status(error.status || 500)
-	res.json({
-		error: {
-			message: error.message
-		}
-	})
+	res.json({ data: error })
 })
-
-// eslint-disable-next-line no-unused-vars
-const routes = require('./routes')(app)
 
 app.listen(process.env.PORT, err => {
 	if (err) console.error('something bad happened', err)

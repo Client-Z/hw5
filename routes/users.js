@@ -8,7 +8,7 @@
 
 const express = require('express')
 const router = express.Router()
-const { users } = require('../services/data.js')
+const { users } = require('../models/data')
 const helpers = require('../services/helpers')
 
 router.get('/', (req, res) => res.send(JSON.stringify({ data: users })))

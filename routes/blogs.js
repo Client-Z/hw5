@@ -8,12 +8,12 @@
 
 const express = require('express')
 const router = express.Router()
-const { blogs } = require('../services/data.js')
+const { blogs } = require('../models/data')
 const helpers = require('../services/helpers')
 
-router.get('/', (req, res) => res.send(JSON.stringify({ data: blogs })))
+router.get('/', (req, res, next) => res.send(JSON.stringify({ data: blogs })))
 
-router.post('/', (req, res) => {
+router.post('/', (req, res, next) => {
 	if (!req.body) return res.sendStatus(400)
 	req.body.id = `i${(+new Date()).toString(16)}`
 	blogs.push(req.body)
@@ -22,12 +22,12 @@ router.post('/', (req, res) => {
 	res.send(JSON.stringify({ data: req.body }))
 })
 
-router.get('/:id', (req, res) => {
+router.get('/:id', (req, res, next) => {
 	if (!req.body) return res.sendStatus(400)
 	res.send(JSON.stringify({ data: blogs.find(x => x.id === req.params.id) }))
 })
 
-router.put('/:id', (req, res) => {
+router.put('/:id', (req, res, next) => {
 	if (!req.body) return res.sendStatus(400)
 	const idx = helpers.findIndex(blogs, req.params.id)
 	if (idx === null) throw new Error(`The server has no any articles with this id: ${req.params.id}`)
@@ -38,7 +38,7 @@ router.put('/:id', (req, res) => {
 	res.send(JSON.stringify({ data: blogs[idx] }))
 })
 
-router.delete('/:id', (req, res) => {
+router.delete('/:id', (req, res, next) => {
 	if (!req.body) return res.sendStatus(400)
 	const index = helpers.findIndex(blogs, req.params.id)
 	if (index === null) throw new Error(`The server has no any articles with this id: ${req.params.id}`)
