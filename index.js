@@ -1,4 +1,6 @@
 const express = require('express')
+// eslint-disable-next-line no-unused-vars
+const env = require('dotenv').config()
 
 const app = express()
 
