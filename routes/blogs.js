@@ -8,22 +8,10 @@
 
 const express = require('express')
 const router = express.Router()
+const { blogs } = require('../services/data.js')
+const helpers = require('../services/helpers')
 
-let blogs = [
-	{
-		id: '1',
-		title: 'Some title',
-		content: 'Some text',
-		author: 'John Doe',
-		publishedAt: 'Wednesday'
-	}
-]
-
-router.get('/', (req, res) => {
-	res.status(200)
-	res.setHeader('Content-Type', 'application/json')
-	res.send(JSON.stringify({ data: blogs }))
-})
+router.get('/', (req, res) => res.send(JSON.stringify({ data: blogs })))
 
 router.post('/', (req, res) => {
 	if (!req.body) return res.sendStatus(400)
@@ -31,27 +19,18 @@ router.post('/', (req, res) => {
 	blogs.push(req.body)
 	res.status(200)
 	res.setHeader('Content-Type', 'application/json')
-	res.json(res.send(JSON.stringify({ data: req.body })))
+	res.send(JSON.stringify({ data: req.body }))
 })
 
 router.get('/:id', (req, res) => {
 	if (!req.body) return res.sendStatus(400)
-	res.status(200)
-	res.setHeader('Content-Type', 'application/json')
 	res.send(JSON.stringify({ data: blogs.find(x => x.id === req.params.id) }))
 })
 
 router.put('/:id', (req, res) => {
 	if (!req.body) return res.sendStatus(400)
-	res.status(200)
-	res.setHeader('Content-Type', 'application/json')
-	let idx = null
-	for (let i = 0; i < blogs.length; i++) {
-		if (blogs[i].id === req.params.id) {
-			idx = i
-			break
-		}
-	}
+	const idx = helpers.findIndex(blogs, req.params.id)
+	if (idx === null) throw new Error(`The server has no any articles with this id: ${req.params.id}`)
 	if (req.body.title) blogs[idx].title = req.body.title
 	if (req.body.content) blogs[idx].content = req.body.content
 	if (req.body.author) blogs[idx].author = req.body.author
@@ -61,16 +40,9 @@ router.put('/:id', (req, res) => {
 
 router.delete('/:id', (req, res) => {
 	if (!req.body) return res.sendStatus(400)
-	res.status(200)
-	res.setHeader('Content-Type', 'application/json')
-	let idx = null
-	for (let i = 0; i < blogs.length; i++) {
-		if (blogs[i].id === req.params.id) {
-			idx = i
-			break
-		}
-	}
-	res.send(JSON.stringify({ data: blogs[idx] }))
-	blogs.splice(idx, 1)
+	const index = helpers.findIndex(blogs, req.params.id)
+	if (index === null) throw new Error(`The server has no any articles with this id: ${req.params.id}`)
+	res.send(JSON.stringify({ data: blogs[index] }))
+	blogs.splice(index, 1)
 })
 module.exports = router
