@@ -5,7 +5,11 @@ class App {
 	}
 
 	use(fn) {
-		this.nextStack.push(fn)
+		if (typeof fn === 'function') {
+			this.nextStack.push(fn)
+		} else {
+			throw new Error('Not a function was passed to the "use" method!')
+		}
 	}
 
 	handle(req, res) {
