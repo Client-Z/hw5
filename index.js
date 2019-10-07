@@ -1,6 +1,6 @@
 const express = require('express')
 // eslint-disable-next-line no-unused-vars
-const env = require('dotenv').config()
+require('dotenv').config()
 
 const app = express()
 
@@ -8,7 +8,7 @@ app.use(express.urlencoded({ extended: true, limit: '1mb' }))
 app.use(express.json())
 
 // eslint-disable-next-line no-unused-vars
-const routes = require('./routes')(app)
+require('./routes')(app)
 
 app.use((req, res, next) => {
 	const error = new Error('Not found')
