@@ -17,7 +17,6 @@ router.post('/', (req, res, next) => {
 	if (!req.body) return res.sendStatus(400)
 	req.body.id = `i${(+new Date()).toString(16)}`
 	blogs.unshift(req.body)
-	res.status(200)
 	res.send({ data: req.body })
 })
 
