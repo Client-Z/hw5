@@ -16,7 +16,7 @@ router.get('/', (req, res) => res.send(JSON.stringify({ data: users })))
 router.post('/', (req, res) => {
 	if (!req.body) return res.sendStatus(400)
 	req.body.id = `i${(+new Date()).toString(16)}`
-	users.push(req.body)
+	users.unshift(req.body)
 	res.json({ data: req.body })
 })
 
