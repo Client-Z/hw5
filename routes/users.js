@@ -9,7 +9,6 @@
 const express = require('express')
 const router = express.Router()
 const { users } = require('../models/data')
-// const sequelize = require('sequelize')
 // const { Users } = require('../db/models/index.js')
 const helpers = require('../services/helpers')
 
