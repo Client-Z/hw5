@@ -66,7 +66,9 @@ router.get(
 		const articles = await Articles.findAll({
 			where: {
 				authorId: req.params.id
-			}
+			},
+			order: [['createdAt', 'DESC']],
+			include: [{ model: Users, as: 'author' }] // need to add 'author'
 		})
 		res.send({ data: articles })
 	})

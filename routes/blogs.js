@@ -16,7 +16,7 @@ router.get(
 	'/',
 	asyncHandler(async (req, res) => {
 		const articles = await Articles.findAll({
-			order: [['updatedAt', 'DESC']],
+			order: [['createdAt', 'DESC']],
 			include: [{ model: Users, as: 'author' }]
 		})
 		res.send({ data: articles })
