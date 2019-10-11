@@ -1,13 +1,13 @@
 const bcrypt = require('bcrypt')
+const saltRound = 10
 
 const hashPassword = async user => {
 	try {
 		if (user.changed('password')) {
-			const salt = await bcrypt.genSalt(10)
-			user.password = await bcrypt.hash(user.password, salt)
+			user.password = await bcrypt.hash(user.password, saltRound)
 		}
-	} catch (error) {
-		console.log(error)
+	} catch (err) {
+		console.log(err)
 	}
 }
 
