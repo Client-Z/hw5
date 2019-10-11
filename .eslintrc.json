@@ -13,7 +13,13 @@
 		"ecmaVersion": 2018
 	},
 	"rules": {
-		"no-tabs": 0
+		"no-tabs": 0,
+		"space-before-function-paren": [
+			"warn",
+			{
+				"asyncArrow": "always"
+			}
+		]
 	},
 	"plugins": ["prettier"]
 }
