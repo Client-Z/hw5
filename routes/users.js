@@ -8,11 +8,19 @@
 
 const express = require('express')
 const router = express.Router()
+const asyncHandler = require('express-async-handler')
+
 const { users } = require('../models/data')
-// const { Users } = require('../db/models/index.js')
+const { Users } = require('../db/models/index.js')
 const helpers = require('../services/helpers')
 
-router.get('/', (req, res) => res.send({ data: users }))
+router.get(
+	'/',
+	asyncHandler(async (req, res) => {
+		const users = await Users.findAll()
+		res.send({ data: users })
+	})
+)
 
 router.post('/', (req, res) => {
 	if (!req.body) return res.sendStatus(400)
@@ -21,10 +29,18 @@ router.post('/', (req, res) => {
 	res.json({ data: req.body })
 })
 
-router.get('/:id', (req, res) => {
-	if (!req.body) return res.sendStatus(400)
-	res.send({ data: users.find(x => x.id === req.params.id) })
-})
+router.get(
+	'/:id',
+	asyncHandler(async (req, res) => {
+		if (!req.body) return res.sendStatus(400)
+		const user = await Users.findOne({
+			where: {
+				id: req.params.id
+			}
+		})
+		res.send({ data: user })
+	})
+)
 
 router.put('/:id', (req, res) => {
 	if (!req.body) return res.sendStatus(400)
