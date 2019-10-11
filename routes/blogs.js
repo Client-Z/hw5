@@ -40,7 +40,10 @@ router.get(
 	'/:id',
 	asyncHandler(async (req, res) => {
 		if (!req.body) return res.sendStatus(400)
-		const article = await Articles.findByPk(req.params.id)
+		const article = await Articles.findByPk(req.params.id, {
+			order: [['createdAt', 'DESC']],
+			include: [{ model: Users, as: 'author' }]
+		})
 		res.send({ data: article })
 	})
 )
