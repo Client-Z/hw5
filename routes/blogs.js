@@ -8,39 +8,72 @@
 
 const express = require('express')
 const router = express.Router()
-const { blogs } = require('../models/data')
-const helpers = require('../services/helpers')
+const asyncHandler = require('express-async-handler')
 
-router.get('/', (req, res, next) => res.send({ data: blogs }))
+const { Articles, Users } = require('../db/models/index.js')
 
-router.post('/', (req, res, next) => {
-	if (!req.body) return res.sendStatus(400)
-	req.body.id = `i${(+new Date()).toString(16)}`
-	blogs.unshift(req.body)
-	res.send({ data: req.body })
-})
+router.get(
+	'/',
+	asyncHandler(async (req, res) => {
+		const articles = await Articles.findAll({
+			order: [['updatedAt', 'DESC']],
+			include: [{ model: Users, as: 'author' }]
+		})
+		res.send({ data: articles })
+	})
+)
 
-router.get('/:id', (req, res, next) => {
-	if (!req.body) return res.sendStatus(400)
-	res.send({ data: blogs.find(x => x.id === req.params.id) })
-})
+router.post(
+	'/',
+	asyncHandler(async (req, res) => {
+		if (!req.body) return res.sendStatus(400)
+		const newArticle = await Articles.create({
+			...req.body,
+			createdAt: new Date(),
+			updatedAt: new Date()
+		})
+		res.send({ data: newArticle })
+	})
+)
 
-router.put('/:id', (req, res, next) => {
-	if (!req.body) return res.sendStatus(400)
-	const idx = helpers.findIndex(blogs, req.params.id)
-	if (idx === null) throw new Error(`The server has no any articles with this id: ${req.params.id}`)
-	if (req.body.title) blogs[idx].title = req.body.title
-	if (req.body.content) blogs[idx].content = req.body.content
-	if (req.body.author) blogs[idx].author = req.body.author
-	if (req.body.publishedAt) blogs[idx].publishedAt = req.body.publishedAt
-	res.send({ data: blogs[idx] })
-})
+router.get(
+	'/:id',
+	asyncHandler(async (req, res) => {
+		if (!req.body) return res.sendStatus(400)
+		const article = await Articles.findByPk(req.params.id)
+		res.send({ data: article })
+	})
+)
 
-router.delete('/:id', (req, res, next) => {
-	if (!req.body) return res.sendStatus(400)
-	const index = helpers.findIndex(blogs, req.params.id)
-	if (index === null) throw new Error(`The server has no any articles with this id: ${req.params.id}`)
-	res.send({ data: blogs[index] })
-	blogs.splice(index, 1)
-})
+router.put(
+	'/:id',
+	asyncHandler(async (req, res) => {
+		if (!req.body) return res.sendStatus(400)
+		const updatedArticle = await Articles.update(
+			{
+				...req.body,
+				updatedAt: new Date()
+			},
+			{
+				where: {
+					id: req.params.id
+				}
+			}
+		)
+		res.send({ data: updatedArticle })
+	})
+)
+
+router.delete(
+	'/:id',
+	asyncHandler(async (req, res) => {
+		if (!req.body) return res.sendStatus(400)
+		const destroyedArticle = await Articles.destroy({
+			where: {
+				id: req.params.id
+			}
+		})
+		res.send({ data: destroyedArticle })
+	})
+)
 module.exports = router

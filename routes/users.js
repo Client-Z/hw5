@@ -10,53 +10,97 @@ const express = require('express')
 const router = express.Router()
 const asyncHandler = require('express-async-handler')
 
-const { users } = require('../models/data')
-const { Users } = require('../db/models/index.js')
-const helpers = require('../services/helpers')
+const { Users, Articles } = require('../db/models/index.js')
+const db = require('../db/dbConnection')
 
 router.get(
 	'/',
 	asyncHandler(async (req, res) => {
-		const users = await Users.findAll()
-		res.send({ data: users })
+		let users = await db.query(
+			`SELECT users.*, COUNT(articles.id) AS articles
+			FROM users JOIN articles ON articles.author_id=users.id GROUP BY users.id`
+		)
+		let data = []
+		for (let i = 0; i < users['0'].length; i++) {
+			let obj = {}
+			obj.id = users['0'][i].id
+			obj.email = users['0'][i].email
+			obj.password = users['0'][i].password
+			obj.articles = users['0'][i].articles
+			obj.firstName = users['0'][i].first_name
+			obj.lastName = users['0'][i].last_name
+			obj.createdAt = users['0'][i].created_at
+			obj.updatedAt = users['0'][i].updated_at
+			data.push(obj)
+		}
+		res.send({ data: data })
 	})
 )
 
-router.post('/', (req, res) => {
-	if (!req.body) return res.sendStatus(400)
-	req.body.id = `i${(+new Date()).toString(16)}`
-	users.unshift(req.body)
-	res.json({ data: req.body })
-})
+router.post(
+	'/',
+	asyncHandler(async (req, res) => {
+		if (!req.body) return res.sendStatus(400)
+		const newUser = await Users.create({
+			...req.body,
+			createdAt: new Date(),
+			updatedAt: new Date()
+		})
+		res.send({ data: newUser })
+	})
+)
 
 router.get(
 	'/:id',
 	asyncHandler(async (req, res) => {
 		if (!req.body) return res.sendStatus(400)
-		const user = await Users.findOne({
-			where: {
-				id: req.params.id
-			}
-		})
+		const user = await Users.findByPk(req.params.id)
 		res.send({ data: user })
 	})
 )
 
-router.put('/:id', (req, res) => {
-	if (!req.body) return res.sendStatus(400)
-	const idx = helpers.findIndex(users, req.params.id)
-	if (idx === null) throw new Error(`The server has no any users with this id: ${req.params.id}`)
-	if (req.body.email) users[idx].email = req.body.email
-	if (req.body.firstName) users[idx].firstName = req.body.firstName
-	if (req.body.lastName) users[idx].lastName = req.body.lastName
-	res.send({ data: users[idx] })
-})
+router.get(
+	'/:id/blog',
+	asyncHandler(async (req, res) => {
+		if (!req.body) return res.sendStatus(400)
+		const articles = await Articles.findAll({
+			where: {
+				authorId: req.params.id
+			}
+		})
+		res.send({ data: articles })
+	})
+)
 
-router.delete('/:id', (req, res) => {
-	if (!req.body) return res.sendStatus(400)
-	const index = helpers.findIndex(users, req.params.id)
-	if (index === null) throw new Error(`The server has no any users with this id: ${req.params.id}`)
-	res.send({ data: users[index] })
-	users.splice(index, 1)
-})
+router.put(
+	'/:id',
+	asyncHandler(async (req, res) => {
+		if (!req.body) return res.sendStatus(400)
+		const updatedUser = await Users.update(
+			{
+				...req.body,
+				updatedAt: new Date()
+			},
+			{
+				where: {
+					id: req.params.id
+				}
+			}
+		)
+		res.send({ data: updatedUser })
+	})
+)
+
+router.delete(
+	'/:id',
+	asyncHandler(async (req, res) => {
+		if (!req.body) return res.sendStatus(400)
+		const destroyedUser = await Users.destroy({
+			where: {
+				id: req.params.id
+			}
+		})
+		res.send({ data: destroyedUser })
+	})
+)
 module.exports = router
