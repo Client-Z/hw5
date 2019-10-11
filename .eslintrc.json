@@ -15,7 +15,7 @@
 	"rules": {
 		"no-tabs": 0,
 		"space-before-function-paren": [
-			"warn",
+			0,
 			{
 				"asyncArrow": "always"
 			}
