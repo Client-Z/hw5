@@ -1,5 +1,6 @@
 const { Model, DataTypes } = require('sequelize')
 const sequelize = require('../dbConnection')
+const hashPassword = require('../../services/hashPsw')
 
 class Users extends Model {}
 
@@ -47,7 +48,14 @@ Users.init(
 	},
 	{
 		sequelize,
-		modelName: 'users'
+		modelName: 'users',
+		defaultScope: {
+			attributes: { exclude: ['password'] }
+		},
+		hooks: {
+			beforeCreate: hashPassword,
+			beforeUpdate: hashPassword
+		}
 	}
 )
 

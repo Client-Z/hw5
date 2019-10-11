@@ -18,7 +18,7 @@ router.get(
 	asyncHandler(async (req, res) => {
 		let users = await db.query(
 			`SELECT users.*, COUNT(articles.id) AS articles
-			FROM users JOIN articles ON articles.author_id=users.id GROUP BY users.id`
+			FROM users LEFT JOIN articles ON articles.author_id=users.id GROUP BY users.id`
 		)
 		let data = []
 		for (let i = 0; i < users['0'].length; i++) {
