@@ -16,24 +16,21 @@ const db = require('../db/dbConnection')
 router.get(
 	'/',
 	asyncHandler(async (req, res) => {
-		let users = await db.query(
-			`SELECT users.*, COUNT(articles.id) AS articles
-			FROM users LEFT JOIN articles ON articles.author_id=users.id GROUP BY users.id`
+		const users = await db.query(
+			`
+			SELECT
+				users.id,
+				users.email,
+				users.first_name AS firstName,
+				users.last_name AS lastName,
+				users.last_name AS lastName,
+				COUNT(articles.id) AS articles
+			FROM users 
+			LEFT JOIN articles ON articles.author_id = users.id 
+			GROUP BY users.id`,
+			{ type: db.QueryTypes.SELECT }
 		)
-		let data = []
-		for (let i = 0; i < users['0'].length; i++) {
-			let obj = {}
-			obj.id = users['0'][i].id
-			obj.email = users['0'][i].email
-			obj.password = users['0'][i].password
-			obj.articles = users['0'][i].articles
-			obj.firstName = users['0'][i].first_name
-			obj.lastName = users['0'][i].last_name
-			obj.createdAt = users['0'][i].created_at
-			obj.updatedAt = users['0'][i].updated_at
-			data.push(obj)
-		}
-		res.send({ data: data })
+		res.send({ data: users })
 	})
 )
 
