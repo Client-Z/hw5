@@ -26,7 +26,6 @@ router.get(
 router.post(
 	'/',
 	asyncHandler(async (req, res) => {
-		if (!req.body) return res.sendStatus(400)
 		const newArticle = await Articles.create({
 			...req.body
 		})
@@ -37,7 +36,6 @@ router.post(
 router.get(
 	'/:id',
 	asyncHandler(async (req, res) => {
-		if (!req.body) return res.sendStatus(400)
 		const article = await Articles.findByPk(req.params.id, {
 			order: [['createdAt', 'DESC']],
 			include: [{ model: Users, as: 'author' }]
@@ -49,7 +47,6 @@ router.get(
 router.put(
 	'/:id',
 	asyncHandler(async (req, res) => {
-		if (!req.body) return res.sendStatus(400)
 		const updatedArticle = await Articles.update(
 			{ ...req.body },
 			{
@@ -65,7 +62,6 @@ router.put(
 router.delete(
 	'/:id',
 	asyncHandler(async (req, res) => {
-		if (!req.body) return res.sendStatus(400)
 		const destroyedArticle = await Articles.destroy({
 			where: {
 				id: req.params.id

@@ -37,7 +37,6 @@ router.get(
 router.post(
 	'/',
 	asyncHandler(async (req, res) => {
-		if (!req.body) return res.sendStatus(400)
 		const newUser = await Users.create({
 			...req.body,
 			createdAt: new Date(),
@@ -50,7 +49,6 @@ router.post(
 router.get(
 	'/:id',
 	asyncHandler(async (req, res) => {
-		if (!req.body) return res.sendStatus(400)
 		const user = await Users.findByPk(req.params.id)
 		res.send({ data: user })
 	})
@@ -59,7 +57,6 @@ router.get(
 router.get(
 	'/:id/blog',
 	asyncHandler(async (req, res) => {
-		if (!req.body) return res.sendStatus(400)
 		const articles = await Articles.findAll({
 			where: {
 				authorId: req.params.id
@@ -74,7 +71,6 @@ router.get(
 router.put(
 	'/:id',
 	asyncHandler(async (req, res) => {
-		if (!req.body) return res.sendStatus(400)
 		const updatedUser = await Users.update(
 			{
 				...req.body,
@@ -93,7 +89,6 @@ router.put(
 router.delete(
 	'/:id',
 	asyncHandler(async (req, res) => {
-		if (!req.body) return res.sendStatus(400)
 		const destroyedUser = await Users.destroy({
 			where: {
 				id: req.params.id
