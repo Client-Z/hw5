@@ -86,7 +86,7 @@ router.put(
 				}
 			}
 		)
-		res.send({ data: updatedUser })
+		updatedUser > 0 ? res.send({}) : res.sendStatus(500)
 	})
 )
 
@@ -99,7 +99,7 @@ router.delete(
 				id: req.params.id
 			}
 		})
-		res.send({ data: destroyedUser })
+		destroyedUser > 0 ? res.send({}) : res.sendStatus(500)
 	})
 )
 module.exports = router

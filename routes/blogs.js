@@ -28,9 +28,7 @@ router.post(
 	asyncHandler(async (req, res) => {
 		if (!req.body) return res.sendStatus(400)
 		const newArticle = await Articles.create({
-			...req.body,
-			createdAt: new Date(),
-			updatedAt: new Date()
+			...req.body
 		})
 		res.send({ data: newArticle })
 	})
@@ -53,17 +51,14 @@ router.put(
 	asyncHandler(async (req, res) => {
 		if (!req.body) return res.sendStatus(400)
 		const updatedArticle = await Articles.update(
-			{
-				...req.body,
-				updatedAt: new Date()
-			},
+			{ ...req.body },
 			{
 				where: {
 					id: req.params.id
 				}
 			}
 		)
-		res.send({ data: updatedArticle })
+		updatedArticle > 0 ? res.send({}) : res.sendStatus(500)
 	})
 )
 
@@ -76,7 +71,7 @@ router.delete(
 				id: req.params.id
 			}
 		})
-		res.send({ data: destroyedArticle })
+		destroyedArticle > 0 ? res.send({}) : res.sendStatus(500)
 	})
 )
 module.exports = router
