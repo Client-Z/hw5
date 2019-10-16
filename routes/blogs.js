@@ -11,6 +11,7 @@ const router = express.Router()
 const asyncHandler = require('express-async-handler')
 
 const { Articles, Users } = require('../db/models/index.js')
+const insertView = require('../mongodb/insert')
 
 router.get(
 	'/',
@@ -29,6 +30,13 @@ router.post(
 		const newArticle = await Articles.create({
 			...req.body
 		})
+		// create articlesViews
+		insertView({ articleId: newArticle.id + '', authorId: newArticle.authorId, views: 0 })
+			.then(() => process.exit(0)) //     mongoose.disconnect();  // pass mongoose and make disconnect
+			.catch(e => {
+				console.log(`PROMISE ERROR: ${e}`)
+				process.exit(1)
+			})
 		res.send({ data: newArticle })
 	})
 )
