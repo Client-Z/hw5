@@ -11,7 +11,7 @@ const router = express.Router()
 const asyncHandler = require('express-async-handler')
 
 const { Articles, Users } = require('../db/models/index.js')
-const insertView = require('../mongodb/insert')
+const { insertView, removeView: removeArticlesView, getViews } = require('../mongodb/insert')
 
 router.get(
 	'/',
@@ -30,13 +30,9 @@ router.post(
 		const newArticle = await Articles.create({
 			...req.body
 		})
-		// create articlesViews
 		insertView({ articleId: newArticle.id + '', authorId: newArticle.authorId, views: 0 })
-			.then(() => process.exit(0)) //     mongoose.disconnect();  // pass mongoose and make disconnect
-			.catch(e => {
-				console.log(`PROMISE ERROR: ${e}`)
-				process.exit(1)
-			})
+			.then(mongoose => mongoose.disconnect())
+			.catch(e => console.log(e))
 		res.send({ data: newArticle })
 	})
 )
@@ -48,6 +44,20 @@ router.get(
 			order: [['createdAt', 'DESC']],
 			include: [{ model: Users, as: 'author' }]
 		})
+		const { views, mongoose } = await getViews(req.params.id + '')
+		mongoose.disconnect()
+		article.dataValues.views = views
+		// getViews(req.params.id + '')
+		// 	.then((views, mongoose) => {
+		// 		articleViews = views
+		// 		mongoose.disconnect()
+		// 	})
+		// 	.catch(e => console.log(e))
+
+		console.log(article.dataValues)
+		// insertView({ articleId: req.params.id + ''})
+		// 	.then(mongoose => mongoose.disconnect())
+		// 	.catch(e => console.log(e))
 		res.send({ data: article })
 	})
 )
@@ -75,6 +85,9 @@ router.delete(
 				id: req.params.id
 			}
 		})
+		removeArticlesView(req.params.id)
+			.then(mongoose => mongoose.disconnect())
+			.catch(e => console.log(e))
 		destroyedArticle > 0 ? res.send({}) : res.sendStatus(500)
 	})
 )
