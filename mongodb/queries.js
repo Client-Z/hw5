@@ -4,7 +4,6 @@ const mdb = require('./mongoConnection')
 const ArticlesViews = require('./models/ArticlesViews')
 
 const insertView = async data => {
-	console.log(data)
 	await mdb.connect()
 	const session = await mongoose.startSession()
 	session.startTransaction({})
