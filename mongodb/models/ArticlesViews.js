@@ -6,11 +6,12 @@ const { Schema } = mongoose
 const articlesViews = new Schema({
 	articleId: Number,
 	authorId: Number,
-	views: Number
+	views: Number,
+	updatedAt: Date,
+	createdAt: Date
 })
 
-// articlesViews.post('save', (doc) => {
-// 	mgsLogger.info(`Some description`)
-// })
+articlesViews.pre('updateOne', () => this.update({}, { $set: { updatedAt: new Date() } }))
+articlesViews.pre('save', () => this.set({ createdAt: new Date() }))
 
 module.exports = mongoose.model('articles_view', articlesViews)
