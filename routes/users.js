@@ -13,6 +13,9 @@ const asyncHandler = require('express-async-handler')
 const { Users, Articles } = require('../db/models/index.js')
 const db = require('../db/dbConnection')
 
+const { getViews } = require('../mongodb/queries')
+const { combineArticles2Views } = require('../services/helpers')
+
 router.get(
 	'/',
 	asyncHandler(async (req, res) => {
@@ -24,12 +27,21 @@ router.get(
 				users.first_name AS firstName,
 				users.last_name AS lastName,
 				users.last_name AS lastName,
-				COUNT(articles.id) AS articles
+				COUNT(articles.id) AS articlesCount
 			FROM users 
 			LEFT JOIN articles ON articles.author_id = users.id 
 			GROUP BY users.id`,
 			{ type: db.QueryTypes.SELECT }
 		)
+		const { views, mongoose } = await getViews()
+		mongoose.disconnect()
+		users.forEach(item => {
+			let viewsCount = 0
+			views.forEach(view => {
+				if (item.id === view.authorId) viewsCount += view.views
+			})
+			item.viewsCount = viewsCount
+		})
 		res.send({ data: users })
 	})
 )
@@ -62,8 +74,11 @@ router.get(
 				authorId: req.params.id
 			},
 			order: [['createdAt', 'DESC']],
-			include: [{ model: Users, as: 'author' }] // need to add 'author'
+			include: [{ model: Users, as: 'author' }]
 		})
+		const { views, mongoose } = await getViews(req.params.id)
+		mongoose.disconnect()
+		combineArticles2Views(articles, views)
 		res.send({ data: articles })
 	})
 )

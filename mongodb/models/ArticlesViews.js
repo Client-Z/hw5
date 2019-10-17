@@ -5,7 +5,7 @@ const { Schema } = mongoose
 
 const articlesViews = new Schema({
 	articleId: Number,
-	authorId: String,
+	authorId: Number,
 	views: Number
 })
 

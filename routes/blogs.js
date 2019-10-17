@@ -12,6 +12,7 @@ const asyncHandler = require('express-async-handler')
 
 const { Articles, Users } = require('../db/models/index.js')
 const { insertView, removeView: removeArticlesView, getView, getViews } = require('../mongodb/queries')
+const { combineArticles2Views } = require('../services/helpers')
 
 router.get(
 	'/',
@@ -22,13 +23,7 @@ router.get(
 		})
 		const { views, mongoose } = await getViews()
 		mongoose.disconnect()
-		articles.forEach(item => {
-			views.forEach(view => {
-				if (item.dataValues.id === view.articleId) {
-					item.dataValues.views = view.views
-				}
-			})
-		})
+		combineArticles2Views(articles, views)
 		res.send({ data: articles })
 	})
 )
@@ -39,7 +34,7 @@ router.post(
 		const newArticle = await Articles.create({
 			...req.body
 		})
-		const mongoose = await insertView({ articleId: newArticle.id + '', authorId: newArticle.authorId, views: 0 })
+		const mongoose = await insertView({ articleId: newArticle.id, authorId: newArticle.authorId, views: 0 })
 		mongoose.disconnect()
 		newArticle.view = 0
 		res.send({ data: newArticle })
@@ -53,7 +48,7 @@ router.get(
 			order: [['createdAt', 'DESC']],
 			include: [{ model: Users, as: 'author' }]
 		})
-		const { views, mongoose } = await getView(req.params.id + '')
+		const { views, mongoose } = await getView(req.params.id)
 		mongoose.disconnect()
 		article.dataValues.views = views + 1
 		res.send({ data: article })
