@@ -1,9 +1,8 @@
 const mongoose = require('mongoose')
 
-// TODO: move to .env file
-const user = 'denis'
-const psw = 'FtbBNQrjpihG5brY'
-const dbName = 'denis'
+const user = process.env.USER
+const psw = process.env.PSW
+const dbName = process.env.DB_NAME
 
 const connectionStr = `mongodb+srv://${user}:${psw}@mentorship-ugbfr.gcp.mongodb.net/${dbName}?retryWrites=true&w=majority`
 
