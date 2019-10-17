@@ -4,7 +4,7 @@ const { Schema } = mongoose
 // const mgsLogger = require('../logger/logger').mgsLogger
 
 const articlesViews = new Schema({
-	articleId: String,
+	articleId: Number,
 	authorId: String,
 	views: Number
 })

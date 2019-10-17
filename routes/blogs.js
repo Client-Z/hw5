@@ -11,7 +11,7 @@ const router = express.Router()
 const asyncHandler = require('express-async-handler')
 
 const { Articles, Users } = require('../db/models/index.js')
-const { insertView, removeView: removeArticlesView, getViews } = require('../mongodb/insert')
+const { insertView, removeView: removeArticlesView, getView, getViews } = require('../mongodb/queries')
 
 router.get(
 	'/',
@@ -19,6 +19,15 @@ router.get(
 		const articles = await Articles.findAll({
 			order: [['createdAt', 'DESC']],
 			include: [{ model: Users, as: 'author' }]
+		})
+		const { views, mongoose } = await getViews()
+		mongoose.disconnect()
+		articles.forEach(item => {
+			views.forEach(view => {
+				if (item.dataValues.id === view.articleId) {
+					item.dataValues.views = view.views
+				}
+			})
 		})
 		res.send({ data: articles })
 	})
@@ -30,9 +39,9 @@ router.post(
 		const newArticle = await Articles.create({
 			...req.body
 		})
-		insertView({ articleId: newArticle.id + '', authorId: newArticle.authorId, views: 0 })
-			.then(mongoose => mongoose.disconnect())
-			.catch(e => console.log(e))
+		const mongoose = await insertView({ articleId: newArticle.id + '', authorId: newArticle.authorId, views: 0 })
+		mongoose.disconnect()
+		newArticle.view = 0
 		res.send({ data: newArticle })
 	})
 )
@@ -44,20 +53,9 @@ router.get(
 			order: [['createdAt', 'DESC']],
 			include: [{ model: Users, as: 'author' }]
 		})
-		const { views, mongoose } = await getViews(req.params.id + '')
+		const { views, mongoose } = await getView(req.params.id + '')
 		mongoose.disconnect()
-		article.dataValues.views = views
-		// getViews(req.params.id + '')
-		// 	.then((views, mongoose) => {
-		// 		articleViews = views
-		// 		mongoose.disconnect()
-		// 	})
-		// 	.catch(e => console.log(e))
-
-		console.log(article.dataValues)
-		// insertView({ articleId: req.params.id + ''})
-		// 	.then(mongoose => mongoose.disconnect())
-		// 	.catch(e => console.log(e))
+		article.dataValues.views = views + 1
 		res.send({ data: article })
 	})
 )
@@ -85,9 +83,8 @@ router.delete(
 				id: req.params.id
 			}
 		})
-		removeArticlesView(req.params.id)
-			.then(mongoose => mongoose.disconnect())
-			.catch(e => console.log(e))
+		const mongoose = await removeArticlesView(req.params.id)
+		mongoose.disconnect()
 		destroyedArticle > 0 ? res.send({}) : res.sendStatus(500)
 	})
 )
