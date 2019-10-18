@@ -11,7 +11,12 @@ const articlesViews = new Schema({
 	createdAt: Date
 })
 
-articlesViews.pre('updateOne', () => this.update({}, { $set: { updatedAt: new Date() } }))
-articlesViews.pre('save', () => this.set({ createdAt: new Date() }))
+articlesViews.pre('updateOne', function() {
+	this.update({}, { $set: { updatedAt: new Date() } })
+})
+
+articlesViews.pre('save', function() {
+	this.set({ createdAt: new Date() })
+})
 
 module.exports = mongoose.model('articles_view', articlesViews)
