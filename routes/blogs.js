@@ -13,7 +13,6 @@ const asyncHandler = require('express-async-handler')
 const { Articles, Users } = require('../db/models/index.js')
 const { insertView, removeView: removeArticlesView, getView, getViews } = require('../mongodb/queries')
 const { combineArticles2Views } = require('../services/helpers')
-const { articlesLogger } = require('../services/logger')
 
 router.get(
 	'/',
@@ -53,8 +52,6 @@ router.get(
 		mongoose.disconnect()
 		article.dataValues.views = views + 1
 		res.send({ data: article })
-		const date = new Date()
-		articlesLogger.info(`Viewed at ${date}`)
 	})
 )
 
