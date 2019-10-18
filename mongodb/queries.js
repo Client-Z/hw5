@@ -1,7 +1,9 @@
 const mongoose = require('mongoose')
-const mdb = require('./mongoConnection')
+const { MDatabase: mdb } = require('./mongoConnection')
 
 const ArticlesViews = require('./models/ArticlesViews')
+
+const { errorLogger } = require('./../services/logger')
 
 const insertView = async data => {
 	await mdb.connect()
@@ -16,6 +18,7 @@ const insertView = async data => {
 		session.endSession()
 		return mongoose
 	} catch (error) {
+		errorLogger.error(`An error on MongoDB's transaction`, { metadata: error })
 		await session.abortTransaction()
 		session.endSession()
 		throw error
@@ -34,6 +37,7 @@ const removeView = async articleId => {
 		session.endSession()
 		return mongoose
 	} catch (error) {
+		errorLogger.error(`An error on MongoDB's transaction`, { metadata: error })
 		await session.abortTransaction()
 		session.endSession()
 		throw error
@@ -54,6 +58,7 @@ const getView = async articleId => {
 		session.endSession()
 		return { views, mongoose }
 	} catch (error) {
+		errorLogger.error(`An error on MongoDB's transaction`, { metadata: error })
 		await session.abortTransaction()
 		session.endSession()
 		throw error
@@ -72,6 +77,7 @@ const getViews = async () => {
 		session.endSession()
 		return { views, mongoose }
 	} catch (error) {
+		errorLogger.error(`An error on MongoDB's transaction`, { metadata: error })
 		await session.abortTransaction()
 		session.endSession()
 		throw error

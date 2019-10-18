@@ -21,4 +21,4 @@ class MDatabase {
 	}
 }
 
-module.exports = MDatabase
+module.exports = { MDatabase, connectionStr }
