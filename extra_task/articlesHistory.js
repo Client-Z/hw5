@@ -1,4 +1,3 @@
-// USER='denis' PSW='FtbBNQrjpihG5brY' DB_NAME='denis' node articlesHistory.js
 const mongoose = require('mongoose')
 const { Schema } = mongoose
 const { MDatabase: mdb } = require('../mongodb/mongoConnection')
