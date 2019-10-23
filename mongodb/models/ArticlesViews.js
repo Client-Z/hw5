@@ -11,33 +11,31 @@ const articlesViews = new Schema({
 	createdAt: Date
 })
 
-articlesViews.pre('updateOne', function() {
-	this.update({}, { $set: { updatedAt: new Date() } })
+articlesViews.pre('updateOne', function(next) {
+	this.set({ updatedAt: new Date() })
+	next()
 })
 
-articlesViews.pre('save', function() {
+articlesViews.pre('save', function(next) {
 	this.set({ createdAt: new Date() })
+	next()
 })
 
 // logging changes in mongoDB
-articlesViews.post('find', function() {
-	mongooseLogger.info(`Mongo: Something were requested`)
+articlesViews.post('find', function(docs) {
+	const ids = docs.map(doc => doc.articleId)
+	mongooseLogger.info(`The articles were requested with ids: ${ids}`)
 })
 
-articlesViews.post('findOne', function() {
-	mongooseLogger.info(`Mongo: Some doc was requested`)
+articlesViews.post('findOneAndUpdate', async function(doc) {
+	mongooseLogger.info(`An article was updated with id: ${doc.articleId}`)
+})
+articlesViews.post('findOneAndDelete', async function(doc) {
+	mongooseLogger.info(`An article was deleted with id: ${doc.articleId}`)
 })
 
-articlesViews.post('updateOne', function() {
-	mongooseLogger.info(`Mongo: Something was updated`)
-})
-
-articlesViews.post('deleteOne', function() {
-	mongooseLogger.info(`Mongo: Some doc was deleted`)
-})
-
-articlesViews.post('save', function() {
-	mongooseLogger.info(`Mongo: Something was created`)
+articlesViews.post('save', function(doc) {
+	mongooseLogger.info(`An article was created with id: ${doc.articleId}`)
 })
 
 module.exports = mongoose.model('articles_view', articlesViews)

@@ -21,8 +21,7 @@ router.get(
 			order: [['createdAt', 'DESC']],
 			include: [{ model: Users, as: 'author' }]
 		})
-		const { views, mongoose } = await getViews()
-		mongoose.disconnect()
+		const views = await getViews()
 		combineArticles2Views(articles, views)
 		res.send({ data: articles })
 	})
@@ -34,8 +33,7 @@ router.post(
 		const newArticle = await Articles.create({
 			...req.body
 		})
-		const mongoose = await insertView({ articleId: newArticle.id, authorId: newArticle.authorId, views: 0 })
-		mongoose.disconnect()
+		await insertView({ articleId: newArticle.id, authorId: newArticle.authorId, views: 0 })
 		newArticle.view = 0
 		res.send({ data: newArticle })
 	})
@@ -48,9 +46,8 @@ router.get(
 			order: [['createdAt', 'DESC']],
 			include: [{ model: Users, as: 'author' }]
 		})
-		const { views, mongoose } = await getView(req.params.id)
-		mongoose.disconnect()
-		article.dataValues.views = views + 1
+		const views = await getView(req.params.id)
+		article.dataValues.views = views
 		res.send({ data: article })
 	})
 )
@@ -78,8 +75,7 @@ router.delete(
 				id: req.params.id
 			}
 		})
-		const mongoose = await removeArticlesView(req.params.id)
-		mongoose.disconnect()
+		await removeArticlesView(req.params.id)
 		destroyedArticle > 0 ? res.send({}) : res.sendStatus(500)
 	})
 )

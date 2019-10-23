@@ -33,8 +33,7 @@ router.get(
 			GROUP BY users.id`,
 			{ type: db.QueryTypes.SELECT }
 		)
-		const { views, mongoose } = await getViews()
-		mongoose.disconnect()
+		const views = await getViews()
 		users.forEach(item => {
 			let viewsCount = 0
 			views.forEach(view => {
@@ -76,8 +75,7 @@ router.get(
 			order: [['createdAt', 'DESC']],
 			include: [{ model: Users, as: 'author' }]
 		})
-		const { views, mongoose } = await getViews(req.params.id)
-		mongoose.disconnect()
+		const views = await getViews(req.params.id)
 		combineArticles2Views(articles, views)
 		res.send({ data: articles })
 	})

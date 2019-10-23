@@ -1,10 +1,6 @@
 const mongoose = require('mongoose')
 
-const user = process.env.USER
-const psw = process.env.PSW
-const dbName = process.env.DB_NAME
-
-const connectionStr = `mongodb+srv://${user}:${psw}@mentorship-ugbfr.gcp.mongodb.net/${dbName}?retryWrites=true&w=majority`
+const connectionStr = process.env.CONNECTION_STR
 
 // connection
 class MDatabase {
@@ -20,5 +16,5 @@ class MDatabase {
 		}
 	}
 }
-
+MDatabase.connect()
 module.exports = { MDatabase, connectionStr }
