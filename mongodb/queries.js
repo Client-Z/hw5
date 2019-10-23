@@ -10,8 +10,7 @@ const insertView = async data => {
 	const session = await mongoose.startSession()
 	session.startTransaction({})
 	try {
-		const opts = { session }
-		await ArticlesViews(data).save(opts)
+		await ArticlesViews(data).save({ session })
 		articlesLogger.info(`Added a new article`, { metadata: { articleId: data.articleId } })
 
 		await session.commitTransaction()
@@ -28,8 +27,7 @@ const removeView = async articleId => {
 	const session = await mongoose.startSession()
 	session.startTransaction({})
 	try {
-		const opts = { session }
-		await ArticlesViews.findOneAndDelete({ articleId: articleId }, opts)
+		await ArticlesViews.findOneAndDelete({ articleId: articleId }, { session })
 		articlesLogger.info(`Removed an article`, { metadata: { articleId: articleId } })
 
 		await session.commitTransaction()
@@ -49,9 +47,7 @@ const getView = async articleId => {
 		const opts = { session }
 		const viewsResult = await ArticlesViews.findOneAndUpdate({ articleId: articleId }, { $inc: { views: 1 } }, opts)
 		const views = viewsResult._doc.views + 1
-
-		const date = new Date()
-		articlesLogger.info(`Viewed an article`, { metadata: { articleId: articleId, viewedAt: date } })
+		articlesLogger.info(`Viewed an article`, { metadata: { articleId: articleId, viewedAt: true } }) // пометить что это именно просмотр
 		articlesLogger.info(`Updated an article`, { metadata: { articleId: articleId } })
 
 		await session.commitTransaction()
@@ -69,8 +65,7 @@ const getViews = async () => {
 	const session = await mongoose.startSession()
 	session.startTransaction({})
 	try {
-		const opts = { session }
-		const views = await ArticlesViews.find({}, null, opts)
+		const views = await ArticlesViews.find({}, null, { session })
 
 		await session.commitTransaction()
 		session.endSession()

@@ -17,4 +17,4 @@ class MDatabase {
 	}
 }
 MDatabase.connect()
-module.exports = { MDatabase, connectionStr }
+module.exports = connectionStr

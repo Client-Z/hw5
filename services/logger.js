@@ -1,6 +1,6 @@
 const winston = require('winston')
 require('winston-mongodb')
-const { connectionStr } = require('../mongodb/mongoConnection')
+const connectionStr = require('../mongodb/mongoConnection')
 
 const { format, transports, createLogger } = winston
 
