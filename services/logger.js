@@ -1,6 +1,6 @@
 const winston = require('winston')
 require('winston-mongodb')
-const connectionStr = require('../mongodb/mongoConnection')
+require('../mongodb/mongoConnection')
 
 const { format, transports, createLogger } = winston
 
@@ -8,7 +8,7 @@ const mongooseLogger = createLogger({
 	format: format.combine(format.splat(), format.simple()),
 	transports: [
 		new transports.MongoDB({
-			db: connectionStr,
+			db: process.env.CONNECTION_STR,
 			collection: 'mongoose_logs',
 			decolorize: true,
 			options: {
@@ -33,7 +33,7 @@ const errorLogger = createLogger({
 		}),
 		new transports.MongoDB({
 			level: 'error',
-			db: connectionStr,
+			db: process.env.CONNECTION_STR,
 			collection: 'error_logs',
 			options: {
 				useUnifiedTopology: true,
@@ -53,7 +53,7 @@ const articlesLogger = createLogger({
 		}),
 		new transports.MongoDB({
 			level: 'info',
-			db: connectionStr,
+			db: process.env.CONNECTION_STR,
 			collection: 'articles_logs',
 			options: {
 				useUnifiedTopology: true,

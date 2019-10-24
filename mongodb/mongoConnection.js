@@ -1,12 +1,9 @@
 const mongoose = require('mongoose')
 
-const connectionStr = process.env.CONNECTION_STR
-
-// connection
 class MDatabase {
 	static async connect() {
 		try {
-			return mongoose.connect(connectionStr, {
+			return mongoose.connect(process.env.CONNECTION_STR, {
 				useNewUrlParser: true,
 				useUnifiedTopology: true,
 				replicaSet: 'mentorship-shard-0'
@@ -17,4 +14,3 @@ class MDatabase {
 	}
 }
 MDatabase.connect()
-module.exports = connectionStr

@@ -27,10 +27,10 @@ articlesViews.post('find', function(docs) {
 	mongooseLogger.info(`The articles were requested with ids: ${ids}`)
 })
 
-articlesViews.post('findOneAndUpdate', async function(doc) {
+articlesViews.post('findOneAndUpdate', function(doc) {
 	mongooseLogger.info(`An article was updated with id: ${doc.articleId}`)
 })
-articlesViews.post('findOneAndDelete', async function(doc) {
+articlesViews.post('findOneAndDelete', function(doc) {
 	mongooseLogger.info(`An article was deleted with id: ${doc.articleId}`)
 })
 
