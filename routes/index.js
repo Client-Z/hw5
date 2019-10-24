@@ -1,11 +1,13 @@
 const https = require('https')
 const router = require('express').Router()
 
+const auth = require('./auth')
 const blog = require('./blogs')
 const user = require('./users')
 
 const { mongooseLogger } = require('../services/logger')
 
+router.use('/api/v1', auth)
 router.use('/api/v1/users', user)
 router.use('/api/v1/blog', blog)
 
