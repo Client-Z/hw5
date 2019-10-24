@@ -1,9 +1,9 @@
 const mongoose = require('mongoose')
 const ArticlesViews = require('./models/ArticlesViews')
-const { articlesLogger, errorLogger } = require('./../services/logger')
+const { articlesLogger, errorLogger, mongooseLogger } = require('./../services/logger')
 
 ArticlesViews.createCollection()
-	.then(() => articlesLogger.info(`The collection is ready to use.`))
+	.then(() => mongooseLogger.info(`The collection is ready to use.`))
 	.catch(e => errorLogger.error(`An error on CreateCollection method`, { metadata: e }))
 
 const insertView = async data => {
@@ -11,7 +11,7 @@ const insertView = async data => {
 	session.startTransaction({})
 	try {
 		await ArticlesViews(data).save({ session })
-		articlesLogger.info(`Added a new article`, { metadata: { articleId: data.articleId } })
+		mongooseLogger.info(`Added a new article`, { metadata: { articleId: data.articleId } })
 
 		await session.commitTransaction()
 		session.endSession()
@@ -28,7 +28,7 @@ const removeView = async articleId => {
 	session.startTransaction({})
 	try {
 		await ArticlesViews.findOneAndDelete({ articleId: articleId }, { session })
-		articlesLogger.info(`Removed an article`, { metadata: { articleId: articleId } })
+		mongooseLogger.info(`Removed an article`, { metadata: { articleId: articleId } })
 
 		await session.commitTransaction()
 		session.endSession()
@@ -47,8 +47,8 @@ const getView = async articleId => {
 		const opts = { session }
 		const viewsResult = await ArticlesViews.findOneAndUpdate({ articleId: articleId }, { $inc: { views: 1 } }, opts)
 		const views = viewsResult._doc.views + 1
-		articlesLogger.info(`Updated an article`, { metadata: { articleId: articleId } })
-		articlesLogger.info(`Viewed an article`, { metadata: { articleId: articleId, isView: true } })
+		mongooseLogger.info(`Updated an article`, { metadata: { articleId: articleId } })
+		articlesLogger.info(`Viewed an article`, { metadata: { articleId: articleId } })
 
 		await session.commitTransaction()
 		session.endSession()

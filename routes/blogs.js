@@ -46,7 +46,7 @@ router.get(
 			order: [['createdAt', 'DESC']],
 			include: [{ model: Users, as: 'author' }]
 		})
-		const views = await getView(req.params.id)
+		const views = await getView(+req.params.id)
 		article.dataValues.views = views
 		res.send({ data: article })
 	})

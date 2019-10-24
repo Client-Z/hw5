@@ -8,7 +8,7 @@ const getArticlesLogs = async () => {
 	const session = await mongoose.startSession()
 	session.startTransaction({})
 	try {
-		const articlesLogs = await ArticlesLogs.find({ 'meta.isView': true }).session(session)
+		const articlesLogs = await ArticlesLogs.find({}).session(session)
 		await session.commitTransaction()
 		session.endSession()
 		return articlesLogs
@@ -48,9 +48,7 @@ const insertHistory = async data => {
 	let viewTimeStamps = {}
 	views.forEach(view => {
 		for (let key in logs) {
-			console.log(logs[key].meta, logs[key].meta.articleId, logs[key].meta.isView) // ??
-			/*
-			if (view.articleId === +logs[key].meta.articleId && logs[key].timestamp && logs[key].meta.isView) {
+			if (view.articleId === logs[key].meta.articleId) {
 				if (!viewTimeStamps[view.articleId]) {
 					let obj = { articleId: view.articleId, authorId: view.authorId, viewedAt: [] }
 					obj.viewedAt.push(logs[key].timestamp)
@@ -59,7 +57,6 @@ const insertHistory = async data => {
 					viewTimeStamps[view.articleId].viewedAt.push(logs[key].timestamp)
 				}
 			}
-			*/
 		}
 	})
 	// find data about the latest view of the each article
