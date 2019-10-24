@@ -17,4 +17,18 @@ router.post(
 	})
 )
 
+router.post(
+	'/login',
+	asyncHandler(async (req, res) => {
+		res.send({ data: {} })
+	})
+)
+
+router.post(
+	'/logout',
+	asyncHandler(async (req, res) => {
+		res.send({ data: {} })
+	})
+)
+
 module.exports = router
