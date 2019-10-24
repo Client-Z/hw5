@@ -1,20 +1,12 @@
 const mongoose = require('mongoose')
 const { ArticlesLogs, ArtHistory } = require('./HistoryModels')
 const { getViews } = require('../mongodb/queries')
-const { mongooseLogger } = require('./../services/logger')
 
 // Getting all articles logs
 const getArticlesLogs = async () => {
-	const session = await mongoose.startSession()
-	session.startTransaction({})
 	try {
-		const articlesLogs = await ArticlesLogs.find({}).session(session)
-		await session.commitTransaction()
-		session.endSession()
-		return articlesLogs
+		return await ArticlesLogs.find({})
 	} catch (error) {
-		await session.abortTransaction()
-		session.endSession()
 		throw error
 	}
 }
@@ -50,9 +42,8 @@ const insertHistory = async data => {
 		for (let key in logs) {
 			if (view.articleId === logs[key].meta.articleId) {
 				if (!viewTimeStamps[view.articleId]) {
-					let obj = { articleId: view.articleId, authorId: view.authorId, viewedAt: [] }
-					obj.viewedAt.push(logs[key].timestamp)
-					viewTimeStamps[view.articleId] = obj
+					viewTimeStamps[view.articleId] = { articleId: view.articleId, authorId: view.authorId, viewedAt: [] }
+					viewTimeStamps[view.articleId].viewedAt.push(logs[key].timestamp)
 				} else {
 					viewTimeStamps[view.articleId].viewedAt.push(logs[key].timestamp)
 				}
@@ -64,8 +55,5 @@ const insertHistory = async data => {
 	for (let key in viewTimeStamps) articlesHistory.push(viewTimeStamps[key])
 	insertHistory(articlesHistory)
 		.then(() => process.exit(0))
-		.catch(e => {
-			mongooseLogger.error('Something went wrong', { meta: { error: e } })
-			process.exit(1)
-		})
+		.catch(() => process.exit(1))
 })()

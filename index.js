@@ -3,6 +3,7 @@ const express = require('express')
 
 // Database
 const db = require('./db/dbConnection')
+require('./mongodb/mongoConnection')
 const app = express()
 
 app.use(express.urlencoded({ extended: true, limit: '1mb' }))
