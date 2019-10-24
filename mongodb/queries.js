@@ -40,7 +40,7 @@ const getView = async articleId => {
 
 const getViews = async () => {
 	try {
-		return await ArticlesViews.find({})
+		return await ArticlesViews.find()
 	} catch (error) {
 		errorLogger.error(`An error on MongoDB's transaction`, { metadata: error })
 		throw error
