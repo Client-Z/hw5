@@ -47,8 +47,8 @@ const getView = async articleId => {
 		const opts = { session }
 		const viewsResult = await ArticlesViews.findOneAndUpdate({ articleId: articleId }, { $inc: { views: 1 } }, opts)
 		const views = viewsResult._doc.views + 1
-		articlesLogger.info(`Viewed an article`, { metadata: { articleId: articleId, viewedAt: true } }) // пометить что это именно просмотр
 		articlesLogger.info(`Updated an article`, { metadata: { articleId: articleId } })
+		articlesLogger.info(`Viewed an article`, { metadata: { articleId: articleId, isView: true } })
 
 		await session.commitTransaction()
 		session.endSession()
