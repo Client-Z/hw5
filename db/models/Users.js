@@ -49,9 +49,9 @@ Users.init(
 	{
 		sequelize,
 		modelName: 'users',
-		// defaultScope: {
-		// 	attributes: { exclude: ['password'] }
-		// },
+		defaultScope: {
+			attributes: { exclude: ['password'] }
+		},
 		hooks: {
 			beforeCreate: hashPassword,
 			beforeUpdate: hashPassword

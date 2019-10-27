@@ -10,17 +10,14 @@ const asyncHandler = require('express-async-handler')
 const passport = require('passport')
 
 const { Users } = require('../db/models/index.js')
+const { errorLogger } = require('../services/logger')
 require('../services/passport-local-setup')(passport, asyncHandler)
 
 router.post(
 	'/registration',
 	asyncHandler(async (req, res) => {
 		try {
-			const userData = await Users.findAll({
-				where: {
-					email: req.body.email
-				}
-			})
+			const userData = await Users.findAll({ where: { email: req.body.email } })
 			if (userData.length) {
 				res.status(500)
 				res.send('{ error: "User with this email already exist" }').end()
@@ -37,6 +34,7 @@ router.post(
 			}
 		} catch (err) {
 			res.send({ error: err })
+			errorLogger.error(`An error on MySQL request`, { metadata: err })
 		}
 	})
 )

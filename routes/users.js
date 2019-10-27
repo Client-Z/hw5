@@ -74,17 +74,7 @@ router.get(
 router.put(
 	'/:id',
 	asyncHandler(async (req, res) => {
-		const updatedUser = await Users.update(
-			{
-				...req.body,
-				updatedAt: new Date()
-			},
-			{
-				where: {
-					id: req.params.id
-				}
-			}
-		)
+		const updatedUser = await Users.update({ ...req.body, updatedAt: new Date() }, { where: { id: req.params.id } })
 		updatedUser > 0 ? res.send({}) : res.sendStatus(500)
 	})
 )
