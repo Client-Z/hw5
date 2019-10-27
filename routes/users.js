@@ -47,18 +47,6 @@ router.get(
 	})
 )
 
-router.post(
-	'/',
-	asyncHandler(async (req, res) => {
-		const newUser = await Users.create({
-			...req.body,
-			createdAt: new Date(),
-			updatedAt: new Date()
-		})
-		res.send({ data: newUser })
-	})
-)
-
 router.get(
 	'/:id',
 	asyncHandler(async (req, res) => {

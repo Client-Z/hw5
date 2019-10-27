@@ -30,7 +30,7 @@ router.post(
 					createdAt: new Date(),
 					updatedAt: new Date()
 				})
-				req.logIn(newUser.dataValues.email, function(err) {
+				req.logIn(newUser.dataValues, function(err) {
 					if (err) return res.status(500).send({ error: err })
 					res.send({ data: newUser })
 				})

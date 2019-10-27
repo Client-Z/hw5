@@ -5,11 +5,13 @@ const auth = require('./auth')
 const oauth = require('./oauth')
 const blog = require('./blogs')
 const user = require('./users')
+const profile = require('./profile')
 
 const { mongooseLogger } = require('../services/logger')
 
 router.use('/api/v1/oauth', oauth)
 router.use('/api/v1', auth)
+router.use('/api/v1/profile', profile)
 router.use('/api/v1/users', user)
 router.use('/api/v1/blog', blog)
 

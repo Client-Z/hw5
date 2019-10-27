@@ -28,13 +28,13 @@ module.exports = (passport, asyncHandler) => {
 		)
 	)
 
-	passport.serializeUser((user, done) => done(null, user.email))
+	passport.serializeUser((user, done) => done(null, user.id))
 
-	passport.deserializeUser(async (email, done) => {
+	passport.deserializeUser(async (id, done) => {
 		try {
 			const userData = await Users.findAll({
 				where: {
-					email: email
+					id: id
 				}
 			})
 			const user = userData[0].dataValues
