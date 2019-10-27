@@ -15,9 +15,11 @@ const db = require('../db/dbConnection')
 
 const { getViews } = require('../mongodb/queries')
 const { combineArticles2Views } = require('../services/helpers')
+const authCheck = require('../services/middlewares/authCheck')
 
 router.get(
 	'/',
+	authCheck,
 	asyncHandler(async (req, res) => {
 		const users = await db.query(
 			`

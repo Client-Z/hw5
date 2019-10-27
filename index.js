@@ -1,10 +1,35 @@
 require('dotenv').config()
 const express = require('express')
+const session = require('express-session')
+const passport = require('passport')
 
-// Database
+// Databases
 const db = require('./db/dbConnection')
 require('./mongodb/mongoConnection')
+
+const connectRedis = require('connect-redis')
+const RSessionStore = connectRedis(session)
+const client = require('./services/redis')
+
 const app = express()
+
+app.use(
+	session({
+		store: new RSessionStore({
+			client,
+			prefix: 'denis:sess:'
+		}),
+		secret: '%secret@Str#',
+		saveUninitialized: false, // false
+		resave: false // false
+	})
+)
+app.use(passport.initialize())
+app.use(passport.session())
+
+// app.use(flash())
+// require('./services/passport')(passport)
+// const passportSetup = require('./services/passport-setup')
 
 app.use(express.urlencoded({ extended: true, limit: '1mb' }))
 app.use(express.json())

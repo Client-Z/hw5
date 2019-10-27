@@ -7,28 +7,52 @@
 const express = require('express')
 const router = express.Router()
 const asyncHandler = require('express-async-handler')
+const passport = require('passport')
 
-// const db = require('../db/dbConnection')
+const { Users } = require('../db/models/index.js')
+require('../services/passport-local-setup')(passport, asyncHandler)
 
 router.post(
 	'/registration',
 	asyncHandler(async (req, res) => {
-		res.send({ data: {} })
+		try {
+			const userData = await Users.findAll({
+				where: {
+					email: req.body.email
+				}
+			})
+			if (userData.length) {
+				res.status(500)
+				res.send('{ error: "User with this email already exist" }').end()
+			} else {
+				const newUser = await Users.create({
+					...req.body,
+					createdAt: new Date(),
+					updatedAt: new Date()
+				})
+				req.logIn(newUser.dataValues.email, function(err) {
+					if (err) return res.status(500).send({ error: err })
+					res.send({ data: newUser })
+				})
+			}
+		} catch (err) {
+			res.send({ error: err })
+		}
 	})
 )
 
 router.post(
 	'/login',
-	asyncHandler(async (req, res) => {
-		res.send({ data: {} })
-	})
+	passport.authenticate('local', {
+		failureRedirect: '/login'
+	}),
+	(req, res) => res.send({ data: req.user })
 )
 
-router.post(
-	'/logout',
-	asyncHandler(async (req, res) => {
-		res.send({ data: {} })
-	})
-)
+router.post('/logout', (req, res) => {
+	req.logout()
+	req.session.destroy()
+	res.send({})
+})
 
 module.exports = router
