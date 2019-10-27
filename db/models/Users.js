@@ -1,6 +1,6 @@
 const { Model, DataTypes } = require('sequelize')
 const sequelize = require('../dbConnection')
-const hashPassword = require('../../services/hashPsw')
+const { hashPassword } = require('../../services/hashPsw')
 
 class Users extends Model {}
 

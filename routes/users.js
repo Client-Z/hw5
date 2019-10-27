@@ -15,9 +15,11 @@ const db = require('../db/dbConnection')
 
 const { getViews } = require('../mongodb/queries')
 const { combineArticles2Views } = require('../services/helpers')
+const authCheck = require('../services/middlewares/authCheck')
 
 router.get(
 	'/',
+	authCheck,
 	asyncHandler(async (req, res) => {
 		const users = await db.query(
 			`
@@ -42,18 +44,6 @@ router.get(
 			item.viewsCount = viewsCount
 		})
 		res.send({ data: users })
-	})
-)
-
-router.post(
-	'/',
-	asyncHandler(async (req, res) => {
-		const newUser = await Users.create({
-			...req.body,
-			createdAt: new Date(),
-			updatedAt: new Date()
-		})
-		res.send({ data: newUser })
 	})
 )
 
@@ -84,17 +74,7 @@ router.get(
 router.put(
 	'/:id',
 	asyncHandler(async (req, res) => {
-		const updatedUser = await Users.update(
-			{
-				...req.body,
-				updatedAt: new Date()
-			},
-			{
-				where: {
-					id: req.params.id
-				}
-			}
-		)
+		const updatedUser = await Users.update({ ...req.body, updatedAt: new Date() }, { where: { id: req.params.id } })
 		updatedUser > 0 ? res.send({}) : res.sendStatus(500)
 	})
 )

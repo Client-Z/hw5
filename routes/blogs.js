@@ -13,6 +13,7 @@ const asyncHandler = require('express-async-handler')
 const { Articles, Users } = require('../db/models/index.js')
 const { insertView, removeView: removeArticlesView, getView, getViews } = require('../mongodb/queries')
 const { combineArticles2Views } = require('../services/helpers')
+const authCheck = require('../services/middlewares/authCheck')
 
 router.get(
 	'/',
@@ -29,9 +30,11 @@ router.get(
 
 router.post(
 	'/',
+	authCheck,
 	asyncHandler(async (req, res) => {
 		const newArticle = await Articles.create({
-			...req.body
+			...req.body,
+			authorId: req.session.passport.user
 		})
 		await insertView({ articleId: newArticle.id, authorId: newArticle.authorId, views: 0 })
 		newArticle.view = 0
@@ -55,28 +58,28 @@ router.get(
 router.put(
 	'/:id',
 	asyncHandler(async (req, res) => {
-		const updatedArticle = await Articles.update(
-			{ ...req.body },
-			{
-				where: {
-					id: req.params.id
-				}
-			}
-		)
-		updatedArticle > 0 ? res.send({}) : res.sendStatus(500)
+		if (req.body.authorId === req.session.passport.user) {
+			const updatedArticle = await Articles.update({ ...req.body }, { where: { id: req.params.id } })
+			updatedArticle > 0 ? res.send({}) : res.sendStatus(500)
+		} else {
+			res.sendStatus(403)
+		}
 	})
 )
 
 router.delete(
 	'/:id',
 	asyncHandler(async (req, res) => {
-		const destroyedArticle = await Articles.destroy({
-			where: {
-				id: req.params.id
-			}
-		})
-		await removeArticlesView(req.params.id)
-		destroyedArticle > 0 ? res.send({}) : res.sendStatus(500)
+		const author = await Articles.findByPk(req.params.id, { attributes: ['authorId'] })
+		if (author.dataValues.authorId === req.session.passport.user) {
+			const destroyedArticle = await Articles.destroy({
+				where: { id: req.params.id }
+			})
+			await removeArticlesView(req.params.id)
+			destroyedArticle > 0 ? res.send({}) : res.sendStatus(500)
+		} else {
+			res.sendStatus(403)
+		}
 	})
 )
 module.exports = router

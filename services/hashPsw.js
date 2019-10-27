@@ -11,4 +11,12 @@ const hashPassword = async user => {
 	}
 }
 
-module.exports = hashPassword
+const checkPsw = async (psw, hash) => {
+	try {
+		return await bcrypt.compare(psw, hash)
+	} catch (err) {
+		console.log(err)
+	}
+}
+
+module.exports = { hashPassword, checkPsw }
