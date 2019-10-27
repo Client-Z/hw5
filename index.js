@@ -2,6 +2,8 @@ require('dotenv').config()
 const express = require('express')
 const session = require('express-session')
 const passport = require('passport')
+const RateLimit = require('express-rate-limit')
+const RLimitStore = require('rate-limit-redis')
 
 // logger
 const { errorLogger } = require('./services/logger')
@@ -34,6 +36,32 @@ app.use(
 )
 app.use(passport.initialize())
 app.use(passport.session())
+
+// Limiters
+const limiter = new RateLimit({
+	store: new RLimitStore({
+		client: client,
+		prefix: 'denis:limits:'
+	}),
+	max: 200,
+	delayMs: 0
+})
+
+app.use('/api/v1/blog', limiter)
+app.use('/api/v1/users', limiter)
+app.use('/api/v1/profile', limiter)
+
+const loginLimiter = new RateLimit({
+	store: new RLimitStore({
+		client: client,
+		prefix: 'denis:limits:'
+	}),
+	windowMs: 10 * 60 * 1000,
+	max: 20,
+	delayMs: 0
+})
+
+app.use('/api/v1/login', loginLimiter)
 
 // routes
 const routes = require('./routes')
