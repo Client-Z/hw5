@@ -19,7 +19,6 @@ router.get('*', (req, res) => {
 	https.get(process.env.FRONTEND_URL, response => response.pipe(res))
 	const date = new Date()
 	mongooseLogger.info(`App: incoming ${req.method} request at ${date}`)
-	console.log(req.isAuthenticated(), req.session)
 })
 
 module.exports = router

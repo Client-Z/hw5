@@ -1,4 +1,5 @@
 const bcrypt = require('bcrypt')
+const { errorLogger } = require('./logger')
 const saltRound = 10
 
 const hashPassword = async user => {
@@ -7,7 +8,7 @@ const hashPassword = async user => {
 			user.password = await bcrypt.hash(user.password, saltRound)
 		}
 	} catch (err) {
-		console.log(err)
+		errorLogger.error(`Some problem with passwords hashing`, { metadata: err })
 	}
 }
 
@@ -15,7 +16,7 @@ const checkPsw = async (psw, hash) => {
 	try {
 		return await bcrypt.compare(psw, hash)
 	} catch (err) {
-		console.log(err)
+		errorLogger.error(`Some problem with passwords comparing`, { metadata: err })
 	}
 }
 
