@@ -66,4 +66,11 @@ Users.associate = models => {
 	})
 }
 
+Users.associate = models => {
+	Users.hasMany(models.Providers, {
+		as: 'oauth_accounts',
+		foreignKey: 'userId'
+	})
+}
+
 module.exports = Users

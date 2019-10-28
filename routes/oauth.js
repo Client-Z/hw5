@@ -14,13 +14,13 @@ const passport = require('passport')
 router.get(
 	'/google',
 	passport.authenticate('google', {
-		scope: ['profile']
+		scope: ['profile', 'https://www.googleapis.com/auth/userinfo.email']
 	})
 )
 
 // needs the right callback url
-router.get('/google/callback', (req, res) => {
-	res.send('you reached the callback URI')
+router.post('/google/callback', passport.authenticate('google'), (req, res) => {
+	res.send({ data: req.user })
 })
 
 module.exports = router

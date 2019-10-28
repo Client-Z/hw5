@@ -11,7 +11,7 @@ const passport = require('passport')
 
 const { Users } = require('../db/models/index.js')
 const { errorLogger } = require('../services/logger')
-require('../services/passport-local-setup')(passport, asyncHandler)
+require('../services/passport-local-setup')(passport)
 
 router.post(
 	'/registration',

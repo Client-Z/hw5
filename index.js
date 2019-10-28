@@ -37,6 +37,9 @@ app.use(
 app.use(passport.initialize())
 app.use(passport.session())
 
+// OAuth
+// require('./services/passport-setup')
+
 app.set('trust proxy', 1)
 // Limiters
 const limiter = new RateLimit({
