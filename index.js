@@ -37,6 +37,7 @@ app.use(
 app.use(passport.initialize())
 app.use(passport.session())
 
+app.set('trust proxy', 1)
 // Limiters
 const limiter = new RateLimit({
 	store: new RLimitStore({
