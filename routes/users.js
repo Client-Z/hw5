@@ -71,23 +71,4 @@ router.get(
 	})
 )
 
-router.put(
-	'/:id',
-	asyncHandler(async (req, res) => {
-		const updatedUser = await Users.update({ ...req.body, updatedAt: new Date() }, { where: { id: req.params.id } })
-		updatedUser > 0 ? res.send({}) : res.sendStatus(500)
-	})
-)
-
-router.delete(
-	'/:id',
-	asyncHandler(async (req, res) => {
-		const destroyedUser = await Users.destroy({
-			where: {
-				id: req.params.id
-			}
-		})
-		destroyedUser > 0 ? res.send({}) : res.sendStatus(500)
-	})
-)
 module.exports = router

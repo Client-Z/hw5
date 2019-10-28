@@ -58,7 +58,7 @@ app.use('/api/v1/profile', limiter)
 const loginLimiter = new RateLimit({
 	store: new RLimitStore({
 		client: client,
-		prefix: 'denis:limits:'
+		prefix: 'denis:loginLimits:'
 	}),
 	windowMs: 10 * 60 * 1000,
 	max: 20,

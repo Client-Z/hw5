@@ -6,4 +6,10 @@ const combineArticles2Views = (articles, views) => {
 	})
 }
 
-module.exports = { combineArticles2Views }
+const logOut = (req, res) => {
+	req.logout()
+	req.session.destroy()
+	res.send({})
+}
+
+module.exports = { combineArticles2Views, logOut }

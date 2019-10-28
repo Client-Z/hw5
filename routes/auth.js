@@ -10,31 +10,28 @@ const asyncHandler = require('express-async-handler')
 const passport = require('passport')
 
 const { Users } = require('../db/models/index.js')
-const { errorLogger } = require('../services/logger')
 require('../services/passport-local-setup')(passport)
+const { logOut } = require('../services/helpers')
 
 router.post(
 	'/registration',
 	asyncHandler(async (req, res) => {
-		try {
-			const userData = await Users.findAll({ where: { email: req.body.email } })
-			if (userData.length) {
-				res.status(500)
-				res.send('{ error: "User with this email already exist" }').end()
-			} else {
-				const newUser = await Users.create({
-					...req.body,
-					createdAt: new Date(),
-					updatedAt: new Date()
-				})
-				req.logIn(newUser.dataValues, function(err) {
-					if (err) return res.status(500).send({ error: err })
-					res.send({ data: newUser })
-				})
+		const userData = await Users.findOne({ where: { email: req.body.email } })
+		if (userData) {
+			res.status(500)
+			res.send('{ error: "User with this email already exist" }').end()
+		} else {
+			const userItem = {
+				firstName: req.body.firstName,
+				lastName: req.body.lastName,
+				email: req.body.email,
+				password: req.body.password
 			}
-		} catch (err) {
-			res.send({ error: err })
-			errorLogger.error(`An error on MySQL request`, { metadata: err })
+			const newUser = await Users.create(userItem)
+			req.logIn(newUser.dataValues, function(err) {
+				if (err) return res.status(500).send({ error: err })
+				res.send({ data: newUser })
+			})
 		}
 	})
 )
@@ -47,10 +44,6 @@ router.post(
 	(req, res) => res.send({ data: req.user })
 )
 
-router.post('/logout', (req, res) => {
-	req.logout()
-	req.session.destroy()
-	res.send({})
-})
+router.post('/logout', (req, res) => logOut(req, res))
 
 module.exports = router

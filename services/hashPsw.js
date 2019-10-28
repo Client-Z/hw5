@@ -12,12 +12,6 @@ const hashPassword = async user => {
 	}
 }
 
-const checkPsw = async (psw, hash) => {
-	try {
-		return await bcrypt.compare(psw, hash)
-	} catch (err) {
-		errorLogger.error(`Some problem with passwords comparing`, { metadata: err })
-	}
-}
+const checkPsw = (psw, hash) => bcrypt.compare(psw, hash)
 
 module.exports = { hashPassword, checkPsw }

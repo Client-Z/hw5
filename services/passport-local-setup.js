@@ -27,10 +27,8 @@ module.exports = passport => {
 	passport.use(
 		new LocalStrategy({ usernameField: 'email', passwordField: 'password' }, async (email, password, done) => {
 			try {
-				const userData = await Users.unscoped().findOne({
-					where: { email: email }
-				})
-				const user = userData.dataValues
+				const userData = await Users.unscoped().findOne({ where: { email: email } })
+				const user = userData.get({ plain: true })
 				const match = await checkPsw(password, user.password)
 				if (match) return done(null, user)
 				return done(null, {})

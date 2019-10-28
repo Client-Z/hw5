@@ -12,25 +12,16 @@ const asyncHandler = require('express-async-handler')
 
 const { Users } = require('../db/models/index.js')
 const authCheck = require('../services/middlewares/authCheck')
+const { logOut } = require('../services/helpers')
 
 router.put(
 	'/',
 	authCheck,
 	asyncHandler(async (req, res) => {
-		const userID = req.session.passport.user
-		const updatedUser = await Users.update(
-			{
-				...req.body,
-				updatedAt: new Date()
-			},
-			{
-				where: {
-					id: userID
-				}
-			}
-		)
+		const userItem = { firstName: req.body.firstName, lastName: req.body.lastName }
+		const updatedUser = await Users.update(userItem, { where: { id: req.user.id } })
 		if (updatedUser > 0) {
-			const user = await Users.findByPk(userID)
+			const user = await Users.findByPk(req.user.id)
 			res.send({ data: user })
 		} else {
 			res.sendStatus(500)
@@ -42,18 +33,9 @@ router.delete(
 	'/',
 	authCheck,
 	asyncHandler(async (req, res) => {
-		const destroyedUser = await Users.destroy({
-			where: {
-				id: req.session.passport.user
-			}
-		})
-		if (destroyedUser > 0) {
-			req.logout()
-			req.session.destroy()
-			res.send({})
-		} else {
-			res.sendStatus(500)
-		}
+		const destroyedUser = await Users.destroy({ where: { id: req.user.id } })
+		if (destroyedUser > 0) return logOut(req, res)
+		res.sendStatus(500)
 	})
 )
 module.exports = router

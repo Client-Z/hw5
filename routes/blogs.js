@@ -32,10 +32,7 @@ router.post(
 	'/',
 	authCheck,
 	asyncHandler(async (req, res) => {
-		const newArticle = await Articles.create({
-			...req.body,
-			authorId: req.session.passport.user
-		})
+		const newArticle = await Articles.create({ ...req.body, authorId: req.user.id })
 		await insertView({ articleId: newArticle.id, authorId: newArticle.authorId, views: 0 })
 		newArticle.view = 0
 		res.send({ data: newArticle })
