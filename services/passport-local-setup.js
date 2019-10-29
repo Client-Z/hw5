@@ -63,7 +63,7 @@ module.exports = passport => {
 	passport.use(
 		new GoogleStrategy(
 			{
-				callbackURL: process.env.LOCAL_GOOGLE_CALLBACK_URL,
+				callbackURL: process.env.GOOGLE_CALLBACK_URL,
 				clientID: process.env.GOOGLE_CLIENT_ID,
 				clientSecret: process.env.GOOGLE_CLIENT_SECRET
 			},
