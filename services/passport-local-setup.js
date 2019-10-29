@@ -101,6 +101,7 @@ module.exports = passport => {
 			},
 			async (accessToken, refreshToken, profile, done) => {
 				if (profile.id) {
+					console.log(profile, profile.emails)
 					try {
 						// Check if we already have a user with this email
 						const userData = await Users.findOne({ where: { email: profile.emails[0].value } })
