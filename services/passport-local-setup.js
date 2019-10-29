@@ -27,7 +27,8 @@ const createUser = async profile => {
 		firstName = profile.name.givenName
 		lastName = profile.name.familyName
 	}
-	return await Users.create({ firstName: firstName, lastName: lastName, email: email, password: '' })
+	const user = await Users.create({ firstName: firstName, lastName: lastName, email: email, password: '' })
+	return user
 }
 
 module.exports = passport => {
