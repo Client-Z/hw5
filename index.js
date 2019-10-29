@@ -31,6 +31,7 @@ app.use(
 		}),
 		secret: '%secret@Str#',
 		saveUninitialized: false,
+		rolling: false,
 		resave: false
 	})
 )

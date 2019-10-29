@@ -6,20 +6,19 @@
 */
 const express = require('express')
 const router = express.Router()
-// const asyncHandler = require('express-async-handler')
 const passport = require('passport')
-// const { Users } = require('../db/models/index.js')
-// const redis = require('../services/redis')
 
-router.get(
-	'/google',
-	passport.authenticate('google', {
-		scope: ['profile', 'https://www.googleapis.com/auth/userinfo.email']
-	})
-)
+router.get('/google', passport.authenticate('google', { scope: ['profile', 'email'] }))
+
+router.get('/facebook', passport.authenticate('facebook'))
 
 // needs the right callback url
 router.post('/google/callback', passport.authenticate('google'), (req, res) => {
+	res.send({ data: req.user })
+})
+
+// needs the right callback url
+router.post('/facebook/callback', passport.authenticate('facebook'), (req, res) => {
 	res.send({ data: req.user })
 })
 
