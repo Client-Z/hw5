@@ -57,7 +57,7 @@ module.exports = passport => {
 	passport.deserializeUser(async (id, done) => {
 		try {
 			const userData = await Users.findAll({ where: { id: id } })
-			const user = userData[0].dataValues
+			const user = Users.build(userData[0].dataValues)
 			if (user) return done(null, user)
 			done(null, false)
 		} catch (err) {

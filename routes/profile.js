@@ -18,14 +18,8 @@ router.put(
 	'/',
 	authCheck,
 	asyncHandler(async (req, res) => {
-		const userItem = { firstName: req.body.firstName, lastName: req.body.lastName }
-		const updatedUser = await Users.update(userItem, { where: { id: req.user.id } })
-		if (updatedUser > 0) {
-			const user = await Users.findByPk(req.user.id)
-			res.send({ data: user })
-		} else {
-			res.sendStatus(500)
-		}
+		req.user.update({ firstName: req.body.firstName, lastName: req.body.lastName })
+		res.send({ data: req.user })
 	})
 )
 
