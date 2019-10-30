@@ -88,7 +88,7 @@ module.exports = passport => {
 				clientID: process.env.GOOGLE_CLIENT_ID,
 				clientSecret: process.env.GOOGLE_CLIENT_SECRET
 			},
-			async (accessToken, refreshToken, profile, done) => oauthStrategy(profile, done)
+			(accessToken, refreshToken, profile, done) => oauthStrategy(profile, done)
 		)
 	)
 
@@ -100,7 +100,7 @@ module.exports = passport => {
 				callbackURL: process.env.FACEBOOK_CALLBACK_URL,
 				profileFields: ['id', 'displayName', 'email']
 			},
-			async (accessToken, refreshToken, profile, done) => oauthStrategy(profile, done)
+			(accessToken, refreshToken, profile, done) => oauthStrategy(profile, done)
 		)
 	)
 }
