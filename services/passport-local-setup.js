@@ -27,8 +27,28 @@ const createUser = async profile => {
 		firstName = profile.name.givenName
 		lastName = profile.name.familyName
 	}
-	const user = await Users.create({ firstName: firstName, lastName: lastName, email: email, password: '' })
-	return user
+	return await Users.create({ firstName: firstName, lastName: lastName, email: email, password: '' })
+}
+
+const oauthStrategy = async (profile, done) => {
+	if (profile.id) {
+		try {
+			// Check if we already have a user with this email
+			const userData = await Users.findOne({ where: { email: profile.emails[0].value } })
+			if (userData) {
+				const user = userData.dataValues
+				const hasAccount = await Providers.findOne({ where: { providerUserId: profile.id } })
+				if (!hasAccount) createOauthAccount(user.id, profile)
+				done(null, user)
+			} else {
+				const newUser = await createUser(profile)
+				createOauthAccount(newUser.dataValues.id, profile)
+				done(null, newUser.dataValues)
+			}
+		} catch (err) {
+			errorLogger.error(`An error on MySQL request`, { metadata: err })
+		}
+	}
 }
 
 module.exports = passport => {
@@ -68,26 +88,7 @@ module.exports = passport => {
 				clientID: process.env.GOOGLE_CLIENT_ID,
 				clientSecret: process.env.GOOGLE_CLIENT_SECRET
 			},
-			async (accessToken, refreshToken, profile, done) => {
-				if (profile.id) {
-					try {
-						// Check if we already have a user with this email
-						const userData = await Users.findOne({ where: { email: profile.emails[0].value } })
-						if (userData) {
-							const user = userData.dataValues
-							const hasAccount = await Providers.findOne({ where: { providerUserId: profile.id } })
-							if (!hasAccount) createOauthAccount(user.id, profile)
-							done(null, user)
-						} else {
-							const newUser = await createUser(profile)
-							createOauthAccount(newUser.dataValues.id, profile)
-							done(null, newUser.dataValues)
-						}
-					} catch (err) {
-						errorLogger.error(`An error on MySQL request`, { metadata: err })
-					}
-				}
-			}
+			async (accessToken, refreshToken, profile, done) => oauthStrategy(profile, done)
 		)
 	)
 
@@ -99,27 +100,7 @@ module.exports = passport => {
 				callbackURL: process.env.FACEBOOK_CALLBACK_URL,
 				profileFields: ['id', 'displayName', 'email']
 			},
-			async (accessToken, refreshToken, profile, done) => {
-				if (profile.id) {
-					console.log(profile, profile.emails)
-					try {
-						// Check if we already have a user with this email
-						const userData = await Users.findOne({ where: { email: profile.emails[0].value } })
-						if (userData) {
-							const user = userData.dataValues
-							const hasAccount = await Providers.findOne({ where: { providerUserId: profile.id } })
-							if (!hasAccount) createOauthAccount(user.id, profile)
-							done(null, user)
-						} else {
-							const newUser = await createUser(profile)
-							createOauthAccount(newUser.dataValues.id, profile)
-							done(null, newUser.dataValues)
-						}
-					} catch (err) {
-						errorLogger.error(`An error on MySQL request`, { metadata: err })
-					}
-				}
-			}
+			async (accessToken, refreshToken, profile, done) => oauthStrategy(profile, done)
 		)
 	)
 }
