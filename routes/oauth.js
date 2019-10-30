@@ -10,7 +10,7 @@ const passport = require('passport')
 
 router.get('/google', passport.authenticate('google', { scope: ['profile', 'email'] }))
 
-router.get('/facebook', passport.authenticate('facebook'))
+router.get('/facebook', passport.authenticate('facebook', { scope: ['email'] }))
 
 // needs the right callback url
 router.post('/google/callback', passport.authenticate('google'), (req, res) => {
