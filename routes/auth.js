@@ -8,9 +8,10 @@ const express = require('express')
 const router = express.Router()
 const asyncHandler = require('express-async-handler')
 const passport = require('passport')
+const jwt = require('jsonwebtoken')
 
 const { Users } = require('../db/models/index.js')
-require('../services/passport-local-setup')(passport)
+require('../services/passportService')(passport)
 const { logOut } = require('../services/helpers')
 
 router.post(
@@ -45,5 +46,38 @@ router.post(
 )
 
 router.post('/logout', (req, res) => logOut(req, res))
+
+// JWT test
+// FORMAT OF TOKEN
+// Authorization: Bearer <access_token>
+router.post('/jwt/protected-info', verifyToken, (req, res) => {
+	jwt.verify(req.token, 'secretkey', (err, authData) => {
+		err ? res.sendStatus(403) : res.json({ message: 'Info have been got...', authData })
+	})
+})
+
+router.post('/jwt/login', (req, res) => {
+	const user = { id: 1, userName: 'David', email: 'david@gmail.com' }
+	req.query = { ...user }
+	jwt.sign({ userName: req.query.userName }, 'secretkey', { expiresIn: '60s' }, (err, token) => {
+		err ? res.sendStatus(403) : res.json({ token })
+	})
+})
+
+function verifyToken(req, res, next) {
+	// Get auth header value
+	const bearerHeader = req.headers['authorization']
+	// Check if bearer is undefined
+	if (typeof bearerHeader !== 'undefined') {
+		// Split at the space and get token from array
+		const bearer = bearerHeader.split(' ')
+		const bearerToken = bearer[1]
+		req.token = bearerToken
+		next()
+	} else {
+		// Forbidden
+		res.sendStatus(403)
+	}
+}
 
 module.exports = router

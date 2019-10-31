@@ -14,7 +14,7 @@ require('./mongodb/mongoConnection')
 
 const connectRedis = require('connect-redis')
 const RSessionStore = connectRedis(session)
-const client = require('./services/redis')
+const client = require('./services/redisConnectService')
 
 // app
 const app = express()
@@ -37,9 +37,6 @@ app.use(
 )
 app.use(passport.initialize())
 app.use(passport.session())
-
-// OAuth
-// require('./services/passport-setup')
 
 app.set('trust proxy', 1)
 // Limiters
