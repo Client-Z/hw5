@@ -1,6 +1,6 @@
 const { Model, DataTypes } = require('sequelize')
 const sequelize = require('../dbConnection')
-const hashPassword = require('../../services/hashPsw')
+const { hashPassword } = require('../../services/hashPsw')
 
 class Users extends Model {}
 
@@ -63,6 +63,13 @@ Users.associate = models => {
 	Users.hasMany(models.Articles, {
 		as: 'articles',
 		foreignKey: 'authorId'
+	})
+}
+
+Users.associate = models => {
+	Users.hasMany(models.Providers, {
+		as: 'oauth_accounts',
+		foreignKey: 'userId'
 	})
 }
 
