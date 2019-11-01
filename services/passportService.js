@@ -43,18 +43,14 @@ module.exports = passport => {
 	)
 
 	const checkUser = async (email, provider, providerID) => {
-		try {
-			const userData = await Users.findOne({ where: { email: email } })
-			if (userData) {
-				const user = userData.get({ plain: true })
-				const hasAccount = await Providers.findOne({ where: { providerUserId: providerID } })
-				if (!hasAccount) await createOauthAccount(user.id, provider, providerID)
-				return user
-			}
-			return false
-		} catch (err) {
-			errorLogger.error(`An error on MySQL request`, { metadata: err })
+		const userData = await Users.findOne({ where: { email: email } })
+		if (userData) {
+			const user = userData.get({ plain: true })
+			const hasAccount = await Providers.findOne({ where: { providerUserId: providerID } })
+			if (!hasAccount) await createOauthAccount(user.id, provider, providerID)
+			return user
 		}
+		return false
 	}
 
 	passport.use(
