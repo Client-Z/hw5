@@ -42,6 +42,21 @@ module.exports = passport => {
 		})
 	)
 
+	const checkUser = async (email, provider, providerID) => {
+		try {
+			const userData = await Users.findOne({ where: { email: email } })
+			if (userData) {
+				const user = userData.get({ plain: true })
+				const hasAccount = await Providers.findOne({ where: { providerUserId: providerID } })
+				if (!hasAccount) await createOauthAccount(user.id, provider, providerID)
+				return user
+			}
+			return false
+		} catch (err) {
+			errorLogger.error(`An error on MySQL request`, { metadata: err })
+		}
+	}
+
 	passport.use(
 		new GoogleStrategy(
 			{
@@ -52,19 +67,12 @@ module.exports = passport => {
 			async (accessToken, refreshToken, profile, done) => {
 				if (profile.id) {
 					try {
-						// Check if we already have a user with this email
 						const email = profile.emails[0].value
-						const userData = await Users.findOne({ where: { email: email } })
-						if (userData) {
-							const user = userData.dataValues
-							const hasAccount = await Providers.findOne({ where: { providerUserId: profile.id } })
-							if (!hasAccount) createOauthAccount(user.dataValues.id, profile.provider, profile.id)
-							done(null, user)
-						} else {
-							const newUser = await createUser(profile.name.givenName, profile.name.familyName, email)
-							createOauthAccount(newUser.dataValues.id, profile.provider, profile.id)
-							done(null, newUser.dataValues)
-						}
+						const user = await checkUser(email, profile.provider, profile.id)
+						if (user) return done(null, user)
+						const newUser = await createUser(profile.name.givenName, profile.name.familyName, email)
+						createOauthAccount(newUser.dataValues.id, profile.provider, profile.id)
+						done(null, newUser)
 					} catch (err) {
 						errorLogger.error(`An error on MySQL request`, { metadata: err })
 					}
@@ -84,34 +92,27 @@ module.exports = passport => {
 			async (accessToken, refreshToken, profile, done) => {
 				if (profile.id) {
 					try {
-						// Check if we already have a user with this email
-						const userData = await Users.findOne({ where: { email: profile.emails[0].value } })
-						if (userData) {
-							const user = userData.dataValues
-							const hasAccount = await Providers.findOne({ where: { providerUserId: profile.id } })
-							if (!hasAccount) createOauthAccount(user.dataValues.id, profile.provider, profile.id)
-							done(null, user)
-						} else {
-							let firstName = ''
-							let lastName = ''
-							let email = profile.emails[0].value
-							if (!profile.name.givenName || !profile.name.familyName) {
-								const splitPoint = profile.displayName.indexOf(' ')
-								if (splitPoint) {
-									firstName = profile.displayName.slice(0, splitPoint)
-									lastName = profile.displayName.slice(splitPoint)
-								} else {
-									firstName = profile.displayName
-									lastName = 'Is not indicated'
-								}
+						const email = profile.emails[0].value
+						const user = await checkUser(email, profile.provider, profile.id)
+						if (user) return done(null, user)
+						let firstName = ''
+						let lastName = ''
+						if (!profile.name.givenName || !profile.name.familyName) {
+							const splitPoint = profile.displayName.indexOf(' ')
+							if (splitPoint) {
+								firstName = profile.displayName.slice(0, splitPoint)
+								lastName = profile.displayName.slice(splitPoint)
 							} else {
-								firstName = profile.name.givenName
-								lastName = profile.name.familyName
+								firstName = profile.displayName
+								lastName = 'Is not indicated'
 							}
-							const newUser = await createUser(firstName, lastName, email)
-							createOauthAccount(newUser.dataValues.id, profile.provider, profile.id)
-							done(null, newUser.dataValues)
+						} else {
+							firstName = profile.name.givenName
+							lastName = profile.name.familyName
 						}
+						const newUser = await createUser(firstName, lastName, email)
+						createOauthAccount(newUser.dataValues.id, profile.provider, profile.id)
+						done(null, newUser)
 					} catch (err) {
 						errorLogger.error(`An error on MySQL request`, { metadata: err })
 					}
