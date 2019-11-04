@@ -19,6 +19,8 @@ const client = require('./services/redisConnectService')
 // app
 const app = express()
 
+require('./services/multer')
+
 app.use(express.urlencoded({ extended: true, limit: '1mb' }))
 app.use(express.json())
 
