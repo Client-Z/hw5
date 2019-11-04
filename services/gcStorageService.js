@@ -41,7 +41,7 @@ class GCStorage {
 						cb(err)
 						console.log(`stream error: ${err}`)
 					})
-					.on('finish', async file => {
+					.on('finish', () => {
 						cb(null, {
 							path: `https://${this.options.bucket}.storage.googleapis.com/${finalPath}`,
 							filename: filename
