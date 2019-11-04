@@ -1,13 +1,12 @@
-// google cloud storage engine
 const { Storage } = require('@google-cloud/storage')
 const path = require('path')
 const fs = require('fs')
+const sharp = require('sharp')
 
 const bucketName = 'zazmic-internship-blog' // 'GCS_BUCKET', 'z-stream-internship'
 
-class GCStorage extends Storage {
+class GCStorage {
 	constructor(opts) {
-		super(opts)
 		if (!opts.bucket) throw new Error('You have to specify bucket for GCStorage.')
 		if (!opts.keyFilename) throw new Error('You have to specify credentials key file for GCStorage.')
 		this.getDestination = opts.destination || this.getDestination
@@ -34,7 +33,9 @@ class GCStorage extends Storage {
 				const finalPath = path.join(destination, filename)
 				var gcFile = this.gcsBucket.file(finalPath)
 				const streamOpts = { predefinedAcl: this.options.acl || 'publicread' }
+				const sharpResizer = sharp().resize(this.options.size.width, this.options.size.height)
 				file.stream
+					.pipe(sharpResizer)
 					.pipe(gcFile.createWriteStream(streamOpts))
 					.on('error', err => {
 						cb(err)
@@ -62,14 +63,14 @@ class GCStorage extends Storage {
 const avatarStorage = new GCStorage({
 	prefix: `denis/avatars`,
 	bucket: bucketName, // process.env.GCS_BUCKET,
-	keyFilename: path.join(__dirname, '../gcs-key.json'), // process.env.GOOGLE_APPLICATION_CREDENTIALS,
+	keyFilename: path.join(__dirname, '../gcs-key.json'),
 	size: { width: 180, height: 180 }
 })
 
 const articlesStorage = new GCStorage({
 	prefix: `denis/articles`,
 	bucket: bucketName, // process.env.GCS_BUCKET,
-	keyFilename: path.join(__dirname, '../gcs-key.json'), // process.env.GOOGLE_APPLICATION_CREDENTIALS,
+	keyFilename: path.join(__dirname, '../gcs-key.json'),
 	size: { width: 1200, height: 630 }
 })
 
