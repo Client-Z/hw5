@@ -1,9 +1,7 @@
 /*
-	GET /api/v1/users - get all users
-	POST /api/v1/users - add a new user
-	GET /api/v1/users/:id - get the user by id
-	PUT /api/v1/users/:id - update the user by id
-	DELETE /api/v1/users/:id - delete the user by id
+	PUT /api/v1/profile - update user
+	DELETE /api/v1/profile - delete user
+	PUT /api/v1/picture - update or add users picture
 */
 
 const express = require('express')
