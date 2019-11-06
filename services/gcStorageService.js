@@ -3,8 +3,6 @@ const path = require('path')
 const sharp = require('sharp')
 const { errorLogger } = require('./logger')
 
-const bucketName = 'zazmic-internship-blog' // 'GCS_BUCKET', 'z-stream-internship', process.env.BUCKET_NAME
-
 class GCStorage {
 	constructor(opts) {
 		if (!opts.bucket) throw new Error('You have to specify bucket for GCStorage.')
@@ -31,6 +29,7 @@ class GCStorage {
 			this.getFilename(req, file, async (err, filename) => {
 				if (err) return cb(err)
 				const finalPath = path.join(destination, filename)
+				console.log(finalPath)
 				var gcFile = this.gcsBucket.file(finalPath)
 				const streamOpts = { predefinedAcl: this.options.acl || 'publicread' }
 				const sharpResizer = sharp().resize(this.options.size.width, this.options.size.height)
@@ -58,15 +57,15 @@ class GCStorage {
 
 const avatarStorage = new GCStorage({
 	prefix: `denis/avatars`,
-	bucket: bucketName,
-	keyFilename: path.join(__dirname, '../gcs-key.json'), // '../service-key.json'
+	bucket: process.env.BUCKET_NAME,
+	keyFilename: path.join(__dirname, '../service-key.json'), // '../service-key.json'
 	size: { width: 180, height: 180 }
 })
 
 const articlesStorage = new GCStorage({
 	prefix: `denis/articles`,
-	bucket: bucketName,
-	keyFilename: path.join(__dirname, '../gcs-key.json'),
+	bucket: process.env.BUCKET_NAME,
+	keyFilename: path.join(__dirname, '../service-key.json'),
 	size: { width: 1200, height: 630 }
 })
 
