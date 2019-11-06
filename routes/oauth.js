@@ -12,12 +12,10 @@ router.get('/google', passport.authenticate('google', { scope: ['profile', 'emai
 
 router.get('/facebook', passport.authenticate('facebook', { scope: ['email'] }))
 
-// needs the right callback url
 router.post('/google/callback', passport.authenticate('google'), (req, res) => {
 	res.send({ data: req.user })
 })
 
-// needs the right callback url
 router.post('/facebook/callback', passport.authenticate('facebook'), (req, res) => {
 	res.send({ data: req.user })
 })

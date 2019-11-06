@@ -58,7 +58,7 @@ class GCStorage {
 const avatarStorage = new GCStorage({
 	prefix: `denis/avatars`,
 	bucket: process.env.BUCKET_NAME,
-	keyFilename: path.join(__dirname, '../service-key.json'), // '../service-key.json'
+	keyFilename: path.join(__dirname, '../service-key.json'),
 	size: { width: 180, height: 180 }
 })
 

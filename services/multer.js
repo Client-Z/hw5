@@ -5,7 +5,7 @@ const { avatarStorage, articlesStorage } = require('./gcStorageService')
 const avatarMulter = Multer({
 	storage: avatarStorage,
 	limits: {
-		fileSize: 5 * 1024 * 1024 // Max file size is 5MB
+		fileSize: 5 * 1024 * 1024
 	}
 })
 
