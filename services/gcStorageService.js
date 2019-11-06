@@ -1,7 +1,7 @@
 const { Storage } = require('@google-cloud/storage')
 const path = require('path')
-const fs = require('fs')
 const sharp = require('sharp')
+const { errorLogger } = require('./logger')
 
 const bucketName = 'zazmic-internship-blog' // 'GCS_BUCKET', 'z-stream-internship'
 
@@ -38,12 +38,12 @@ class GCStorage {
 					.pipe(sharpResizer)
 					.pipe(gcFile.createWriteStream(streamOpts))
 					.on('error', err => {
+						errorLogger.error(`Error while file uploading`, { metadata: err })
 						cb(err)
-						console.log(`stream error: ${err}`)
 					})
 					.on('finish', () => {
 						cb(null, {
-							path: `https://${this.options.bucket}.storage.googleapis.com/${finalPath}`,
+							path: `https://storage.googleapis.com/${this.options.bucket}/${finalPath}`,
 							filename: filename
 						})
 					})
@@ -52,11 +52,16 @@ class GCStorage {
 	}
 
 	_removeFile(req, file, cb) {
-		const path = file.path
-		delete file.destination
-		delete file.filename
-		delete file.path
-		fs.unlink(path, cb)
+		var gcFile = this.gcsBucket.file(file.filename)
+		gcFile.delete()
+		// this.gcsBucket
+		// 	.file(finalPath)
+		// 	.delete()
+		// 	.then(() => cb(null, 'Was deleted'))
+		// 	.catch(err => {
+		// 		errorLogger.error(`Error while file uploading`, { metadata: err })
+		// 		cb(err)
+		// 	})
 	}
 }
 

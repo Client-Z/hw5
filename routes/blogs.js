@@ -14,6 +14,8 @@ const { Articles, Users } = require('../db/models/index.js')
 const { insertView, removeView: removeArticlesView, getView, getViews } = require('../mongodb/queries')
 const { combineArticles2Views } = require('../services/helpers')
 const authCheck = require('../services/middlewares/authCheck')
+const { articlesMulter } = require('../services/multer')
+const { gcArticlesIMGRemover } = require('../services/gcRemovalService')
 
 router.get(
 	'/',
@@ -31,11 +33,38 @@ router.get(
 router.post(
 	'/',
 	authCheck,
+	articlesMulter.single('picture'),
 	asyncHandler(async (req, res) => {
-		const newArticle = await Articles.create({ ...req.body, authorId: req.user.id })
+		let newArticle = null
+		if (req.file) {
+			newArticle = await Articles.create({ ...req.body, authorId: req.user.id, picture: req.file.path })
+		} else {
+			newArticle = await Articles.create({ ...req.body, authorId: req.user.id })
+		}
 		await insertView({ articleId: newArticle.id, authorId: newArticle.authorId, views: 0 })
 		newArticle.view = 0
 		res.send({ data: newArticle })
+	})
+)
+router.put(
+	'/:id',
+	authCheck,
+	articlesMulter.single('picture'),
+	asyncHandler(async (req, res) => {
+		const data = await Articles.findByPk(req.params.id, { attributes: ['authorId', 'picture'] })
+		const articleData = data.get({ plain: true })
+		if (articleData.authorId === req.user.id) {
+			let updatedArticle = null
+			if (req.file) {
+				if (articleData.picture) gcArticlesIMGRemover.remove(articleData.picture)
+				updatedArticle = await Articles.update({ ...req.body, picture: req.file.path }, { where: { id: req.params.id } })
+			} else {
+				updatedArticle = await Articles.update({ ...req.body }, { where: { id: req.params.id } })
+			}
+			return updatedArticle > 0 ? res.status(200).send({}) : res.sendStatus(500)
+		} else {
+			res.sendStatus(403)
+		}
 	})
 )
 
@@ -52,27 +81,15 @@ router.get(
 	})
 )
 
-router.put(
-	'/:id',
-	asyncHandler(async (req, res) => {
-		if (req.body.authorId === req.session.passport.user) {
-			const updatedArticle = await Articles.update({ ...req.body }, { where: { id: req.params.id } })
-			updatedArticle > 0 ? res.send({}) : res.sendStatus(500)
-		} else {
-			res.sendStatus(403)
-		}
-	})
-)
-
 router.delete(
 	'/:id',
 	asyncHandler(async (req, res) => {
-		const author = await Articles.findByPk(req.params.id, { attributes: ['authorId'] })
-		if (author.dataValues.authorId === req.session.passport.user) {
-			const destroyedArticle = await Articles.destroy({
-				where: { id: req.params.id }
-			})
+		const data = await Articles.findByPk(req.params.id, { attributes: ['authorId', 'picture'] })
+		const articleData = data.get({ plain: true })
+		if (articleData.authorId === req.user.id) {
+			const destroyedArticle = await Articles.destroy({ where: { id: req.params.id } })
 			await removeArticlesView(req.params.id)
+			gcArticlesIMGRemover.remove(articleData.picture)
 			destroyedArticle > 0 ? res.send({}) : res.sendStatus(500)
 		} else {
 			res.sendStatus(403)

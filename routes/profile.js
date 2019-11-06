@@ -10,10 +10,11 @@ const express = require('express')
 const router = express.Router()
 const asyncHandler = require('express-async-handler')
 
-const { Users } = require('../db/models/index.js')
+const { Users, Articles } = require('../db/models/index.js')
 const authCheck = require('../services/middlewares/authCheck')
 const { logOut } = require('../services/helpers')
 const { avatarMulter } = require('../services/multer')
+// const { gcArticlesIMGRemover } = require('../services/gcRemovalService')
 
 router.put(
 	'/',
@@ -28,6 +29,13 @@ router.delete(
 	'/',
 	authCheck,
 	asyncHandler(async (req, res) => {
+		// remove imgs from GCS
+		// gcArticlesIMGRemover.remove()
+		const user = req.user.get({ plain: true })
+		console.log(user.picture)
+		const articlesImgs = await Articles.findAll({ where: { authorId: user.id } }, { attributes: ['picture'] })
+		console.log(articlesImgs)
+		// destroy users with all articles
 		const destroyedUser = await Users.destroy({ where: { id: req.user.id } })
 		if (destroyedUser > 0) return logOut(req, res)
 		res.sendStatus(500)
@@ -36,10 +44,12 @@ router.delete(
 
 router.put(
 	'/picture',
+	authCheck,
 	avatarMulter.single('picture'),
 	asyncHandler(async (req, res, next) => {
-		console.log('HERE', req.file)
 		if (!req.file) return res.status(400).send('No file uploaded.')
+		req.user.update({ picture: req.file.path })
+		res.send({ data: { picture: req.file.path } })
 	})
 )
 
