@@ -14,7 +14,7 @@ const { Users, Articles } = require('../db/models/index.js')
 const authCheck = require('../services/middlewares/authCheck')
 const { logOut } = require('../services/helpers')
 const { avatarMulter } = require('../services/multer')
-// const { gcArticlesIMGRemover } = require('../services/gcRemovalService')
+const { gcUserIMGRemover } = require('../services/gcRemovalService')
 
 router.put(
 	'/',
@@ -29,13 +29,9 @@ router.delete(
 	'/',
 	authCheck,
 	asyncHandler(async (req, res) => {
-		// remove imgs from GCS
-		// gcArticlesIMGRemover.remove()
-		const user = req.user.get({ plain: true })
-		console.log(user.picture)
-		const articlesImgs = await Articles.findAll({ where: { authorId: user.id } }, { attributes: ['picture'] })
-		console.log(articlesImgs)
-		// destroy users with all articles
+		const imgs = await Articles.findAll({ where: { authorId: req.user.id }, raw: true, attributes: ['picture'] })
+		imgs.push({ picture: req.user.picture })
+		gcUserIMGRemover.remove(imgs)
 		const destroyedUser = await Users.destroy({ where: { id: req.user.id } })
 		if (destroyedUser > 0) return logOut(req, res)
 		res.sendStatus(500)

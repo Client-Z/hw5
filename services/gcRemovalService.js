@@ -1,4 +1,5 @@
 const { avatarStorage, articlesStorage } = require('./gcStorageService')
+const { errorLogger } = require('./logger')
 
 class GCRemoverTool {
 	constructor(storage, bucket) {
@@ -10,18 +11,16 @@ class GCRemoverTool {
 	}
 
 	removeMany(urls) {
-		console.log(`in removeMany: ${urls}`)
-		urls.forEach(url => this.removeOne(url))
+		urls.forEach(url => {
+			if (url.picture) this.removeOne(url.picture)
+		})
 	}
 
 	removeOne(url) {
 		const filePath = new URL(url).pathname
 		const fileName = filePath.replace(new RegExp(`${this.gcsBucket.name}/`, 'g'), '')
 		var gcFile = this.gcsBucket.file(fileName.slice(1))
-		gcFile
-			.delete()
-			.then(() => console.log('img was removed'))
-			.catch(e => console.log(e))
+		gcFile.delete().catch(e => errorLogger.error(`Some problem with pictures removing`, { metadata: e }))
 	}
 }
 

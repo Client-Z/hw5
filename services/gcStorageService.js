@@ -3,7 +3,7 @@ const path = require('path')
 const sharp = require('sharp')
 const { errorLogger } = require('./logger')
 
-const bucketName = 'zazmic-internship-blog' // 'GCS_BUCKET', 'z-stream-internship'
+const bucketName = 'zazmic-internship-blog' // 'GCS_BUCKET', 'z-stream-internship', process.env.BUCKET_NAME
 
 class GCStorage {
 	constructor(opts) {
@@ -52,29 +52,20 @@ class GCStorage {
 	}
 
 	_removeFile(req, file, cb) {
-		var gcFile = this.gcsBucket.file(file.filename)
-		gcFile.delete()
-		// this.gcsBucket
-		// 	.file(finalPath)
-		// 	.delete()
-		// 	.then(() => cb(null, 'Was deleted'))
-		// 	.catch(err => {
-		// 		errorLogger.error(`Error while file uploading`, { metadata: err })
-		// 		cb(err)
-		// 	})
+		this.gcsBucket.file(file.filename).delete()
 	}
 }
 
 const avatarStorage = new GCStorage({
 	prefix: `denis/avatars`,
-	bucket: bucketName, // process.env.GCS_BUCKET,
-	keyFilename: path.join(__dirname, '../gcs-key.json'),
+	bucket: bucketName,
+	keyFilename: path.join(__dirname, '../gcs-key.json'), // '../service-key.json'
 	size: { width: 180, height: 180 }
 })
 
 const articlesStorage = new GCStorage({
 	prefix: `denis/articles`,
-	bucket: bucketName, // process.env.GCS_BUCKET,
+	bucket: bucketName,
 	keyFilename: path.join(__dirname, '../gcs-key.json'),
 	size: { width: 1200, height: 630 }
 })
