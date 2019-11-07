@@ -10,13 +10,13 @@ class GCRemoverTool {
 		Array.isArray(data) ? this.removeMany(data) : this.removeOne(data)
 	}
 
-	removeMany(urls) {
+	static removeMany(urls) {
 		urls.forEach(url => {
 			if (url.picture) this.removeOne(url.picture)
 		})
 	}
 
-	removeOne(url) {
+	static removeOne(url) {
 		const filePath = new URL(url).pathname
 		const fileName = filePath.replace(new RegExp(`${this.gcsBucket.name}/`, 'g'), '')
 		var gcFile = this.gcsBucket.file(fileName.slice(1))
