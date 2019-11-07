@@ -17,7 +17,7 @@ const { gcUserIMGRemover } = require('../services/gcRemovalService')
 router.put(
 	'/',
 	authCheck,
-	asyncHandler(async (req, res, next) => {
+	asyncHandler(async (req, res) => {
 		req.user.update({ firstName: req.body.firstName, lastName: req.body.lastName })
 		res.send({ data: req.user })
 	})
@@ -29,7 +29,7 @@ router.delete(
 	asyncHandler(async (req, res) => {
 		const imgs = await Articles.findAll({ where: { authorId: req.user.id }, raw: true, attributes: ['picture'] })
 		imgs.push({ picture: req.user.picture })
-		gcUserIMGRemover.remove(imgs)
+		await gcUserIMGRemover.remove(imgs)
 		const destroyedUser = await Users.destroy({ where: { id: req.user.id } })
 		if (destroyedUser > 0) return logOut(req, res)
 		res.sendStatus(500)
@@ -40,9 +40,9 @@ router.put(
 	'/picture',
 	authCheck,
 	avatarMulter.single('picture'),
-	asyncHandler(async (req, res, next) => {
+	asyncHandler(async (req, res) => {
 		if (!req.file) return res.status(400).send('No file uploaded.')
-		req.user.update({ picture: req.file.path })
+		await req.user.update({ picture: req.file.path })
 		res.send({ data: { picture: req.file.path } })
 	})
 )

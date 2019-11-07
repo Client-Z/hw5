@@ -19,7 +19,7 @@ class GCStorage {
 	}
 
 	getFilename(req, file, cb) {
-		const prefix = new Date().toISOString()
+		const prefix = Date.now()
 		cb(null, `${prefix}-${file.originalname}`)
 	}
 
@@ -29,7 +29,6 @@ class GCStorage {
 			this.getFilename(req, file, async (err, filename) => {
 				if (err) return cb(err)
 				const finalPath = path.join(destination, filename)
-				console.log(finalPath)
 				var gcFile = this.gcsBucket.file(finalPath)
 				const streamOpts = { predefinedAcl: this.options.acl || 'publicread' }
 				const sharpResizer = sharp().resize(this.options.size.width, this.options.size.height)

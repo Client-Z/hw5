@@ -36,11 +36,9 @@ router.post(
 	articlesMulter.single('picture'),
 	asyncHandler(async (req, res) => {
 		let newArticle = null
-		if (req.file) {
-			newArticle = await Articles.create({ ...req.body, authorId: req.user.id, picture: req.file.path })
-		} else {
-			newArticle = await Articles.create({ ...req.body, authorId: req.user.id })
-		}
+		req.body.authorId = req.user.id
+		if (req.file) req.body.picture = req.file.path
+		newArticle = await Articles.create({ ...req.body })
 		await insertView({ articleId: newArticle.id, authorId: newArticle.authorId, views: 0 })
 		newArticle.view = 0
 		res.send({ data: newArticle })
@@ -55,12 +53,9 @@ router.put(
 		const articleData = data.get({ plain: true })
 		if (articleData.authorId === req.user.id) {
 			let updatedArticle = null
-			if (req.file) {
-				if (articleData.picture) gcArticlesIMGRemover.remove(articleData.picture)
-				updatedArticle = await Articles.update({ ...req.body, picture: req.file.path }, { where: { id: req.params.id } })
-			} else {
-				updatedArticle = await Articles.update({ ...req.body }, { where: { id: req.params.id } })
-			}
+			if (req.file) req.body.picture = req.file.path
+			if (articleData.picture) await gcArticlesIMGRemover.remove(articleData.picture)
+			updatedArticle = await Articles.update({ ...req.body }, { where: { id: req.params.id } })
 			return updatedArticle > 0 ? res.status(200).send({}) : res.sendStatus(500)
 		} else {
 			res.sendStatus(403)
@@ -89,7 +84,7 @@ router.delete(
 		if (articleData.authorId === req.user.id) {
 			const destroyedArticle = await Articles.destroy({ where: { id: req.params.id } })
 			await removeArticlesView(req.params.id)
-			gcArticlesIMGRemover.remove(articleData.picture)
+			await gcArticlesIMGRemover.remove(articleData.picture)
 			destroyedArticle > 0 ? res.send({}) : res.sendStatus(500)
 		} else {
 			res.sendStatus(403)
