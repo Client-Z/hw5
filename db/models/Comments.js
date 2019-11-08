@@ -18,7 +18,6 @@ Comments.init(
 		},
 		authorId: {
 			type: DataTypes.INTEGER,
-			allowNull: false,
 			field: 'author_id'
 		},
 		articleId: {
@@ -41,17 +40,8 @@ Comments.init(
 )
 
 Comments.associate = models => {
-	Comments.belongsTo(models.Users, {
-		as: 'user',
-		foreignKey: 'authorId'
-	})
-}
-
-Comments.associate = models => {
-	Comments.belongsTo(models.Articles, {
-		as: 'article',
-		foreignKey: 'articleId'
-	})
+	Comments.belongsTo(models.Users, { as: 'author', foreignKey: 'authorId' })
+	Comments.belongsTo(models.Articles, { as: 'article', foreignKey: 'articleId' })
 }
 
 module.exports = Comments

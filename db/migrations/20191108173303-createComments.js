@@ -28,7 +28,9 @@ module.exports = {
 					references: {
 						model: 'articles',
 						key: 'id'
-					}
+					},
+					onUpdate: 'cascade',
+					onDelete: 'cascade'
 				},
 				created_at: {
 					type: Sequelize.DATE,
@@ -41,6 +43,6 @@ module.exports = {
 			}
 		),
 	down: (queryInterface, Sequelize) => {
-		queryInterface.dropTable('comments')
+		return queryInterface.dropTable('comments')
 	}
 }

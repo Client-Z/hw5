@@ -4,13 +4,16 @@
 	GET /api/v1/blog/:id - get the blog by id
 	PUT /api/v1/blog/:id - update the blog by id
 	DELETE /api/v1/blog/:id - delete the blog by id
+	GET /blog/:articleId/comments - get all comments
+	POST /blog/:articleId/comments - add a new comment
+	DELETE /blog/:articleId/comments/:id - delete the comments
 */
 
 const express = require('express')
 const router = express.Router()
 const asyncHandler = require('express-async-handler')
 
-const { Articles, Users } = require('../db/models/index.js')
+const { Articles, Users, Comments } = require('../db/models/index.js')
 const { insertView, removeView: removeArticlesView, getView, getViews } = require('../mongodb/queries')
 const { combineArticles2Views } = require('../services/helpers')
 const authCheck = require('../services/middlewares/authCheck')
@@ -91,4 +94,20 @@ router.delete(
 		}
 	})
 )
+
+// Comments
+/*
+	GET /blog/:articleId/comments
+	POST /blog/:articleId/comments
+	DELETE /blog/:articleId/comments/:id
+*/
+
+router.get(
+	'/:id/comments',
+	asyncHandler(async (req, res) => {
+		const comments = await Comments.findAll({ order: [['createdAt', 'DESC']] })
+		res.send({ data: comments })
+	})
+)
+
 module.exports = router

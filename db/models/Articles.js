@@ -54,17 +54,8 @@ Articles.init(
 )
 
 Articles.associate = models => {
-	Articles.belongsTo(models.Users, {
-		as: 'author',
-		foreignKey: 'authorId'
-	})
-}
-
-Articles.associate = models => {
-	Articles.hasMany(models.Comments, {
-		as: 'comments',
-		foreignKey: 'commentId'
-	})
+	Articles.belongsTo(models.Users, { as: 'author', foreignKey: 'authorId' })
+	Articles.hasMany(models.Comments, { as: 'comments', foreignKey: 'articleId' })
 }
 
 module.exports = Articles
