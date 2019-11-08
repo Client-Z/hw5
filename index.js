@@ -37,7 +37,7 @@ app.use(passport.session())
 
 app.set('trust proxy', 1)
 // apply Limiters
-const { limiter, loginLimiter } = require('./services/rateLimitService')
+const { limiter, loginLimiter, wsLimiter } = require('./services/rateLimitService')(client)
 app.use('/api/v1/blog', limiter)
 app.use('/api/v1/users', limiter)
 app.use('/api/v1/profile', limiter)
@@ -61,7 +61,7 @@ app.use((error, req, res, next) => {
 const server = http.createServer(app)
 
 // WS
-require('./services/socketService')(server, rStore)
+require('./services/socketService')(server, rStore, wsLimiter)
 
 // Connect to DB and run the server
 db.authenticate()
