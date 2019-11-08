@@ -1,9 +1,8 @@
 require('dotenv').config()
+const http = require('http')
 const express = require('express')
 const session = require('express-session')
 const passport = require('passport')
-const RateLimit = require('express-rate-limit')
-const RLimitStore = require('rate-limit-redis')
 
 // logger
 const { errorLogger } = require('./services/logger')
@@ -23,13 +22,11 @@ app.use(express.urlencoded({ extended: true, limit: '1mb' }))
 app.use(express.json())
 
 // authentication
+const rStore = new RSessionStore({ client, prefix: 'denis:sess:' })
 app.use(
 	session({
-		store: new RSessionStore({
-			client,
-			prefix: 'denis:sess:'
-		}),
-		secret: '%secret@Str#',
+		store: rStore,
+		secret: process.env.SESSION_SECRET,
 		saveUninitialized: false,
 		rolling: false,
 		resave: false
@@ -39,30 +36,11 @@ app.use(passport.initialize())
 app.use(passport.session())
 
 app.set('trust proxy', 1)
-// Limiters
-const limiter = new RateLimit({
-	store: new RLimitStore({
-		client: client,
-		prefix: 'denis:limits:'
-	}),
-	max: 200,
-	delayMs: 0
-})
-
+// apply Limiters
+const { limiter, loginLimiter } = require('./services/rateLimitService')
 app.use('/api/v1/blog', limiter)
 app.use('/api/v1/users', limiter)
 app.use('/api/v1/profile', limiter)
-
-const loginLimiter = new RateLimit({
-	store: new RLimitStore({
-		client: client,
-		prefix: 'denis:loginLimits:'
-	}),
-	windowMs: 10 * 60 * 1000,
-	max: 20,
-	delayMs: 0
-})
-
 app.use('/api/v1/login', loginLimiter)
 
 // routes
@@ -80,10 +58,15 @@ app.use((error, req, res, next) => {
 	res.json({ data: error })
 })
 
+const server = http.createServer(app)
+
+// WS
+require('./services/socketService')(server, rStore)
+
 // Connect to DB and run the server
 db.authenticate()
 	.then(() => {
-		app.listen(process.env.PORT, err => {
+		server.listen(process.env.PORT, err => {
 			if (err) errorLogger.error(`Some problem with server running`, { metadata: err })
 			console.log('server listening port 8803')
 		})
