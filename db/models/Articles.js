@@ -60,4 +60,11 @@ Articles.associate = models => {
 	})
 }
 
+Articles.associate = models => {
+	Articles.hasMany(models.Comments, {
+		as: 'comments',
+		foreignKey: 'commentId'
+	})
+}
+
 module.exports = Articles
