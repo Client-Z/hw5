@@ -125,11 +125,14 @@ router.post(
 	authCheck,
 	asyncHandler(async (req, res) => {
 		req.body.authorId = req.user.id
-		req.body.articleId = req.params.id
+		req.body.articleId = +req.params.id
 		const newComment = await Comments.create({ ...req.body })
-		const data = newComment.get({ plain: true })
-		data.author = await Users.findByPk(data.authorId, { attributes: ['id', 'firstName', 'lastName', 'picture'], raw: true })
-		res.send({ data: data })
+		const comment = newComment.get({ plain: true })
+		comment.author = await Users.findByPk(comment.authorId, { attributes: ['id', 'firstName', 'lastName', 'picture'], raw: true })
+		// sockets
+		const io = req.app.get('socketio')
+		io.to(`room-${req.params.id}`).emit('comment', { action: 'create', data: { comment } })
+		res.send({ data: comment })
 	})
 )
 
@@ -138,7 +141,12 @@ router.delete(
 	authCheck,
 	asyncHandler(async (req, res) => {
 		req.body.id = req.params.id
+		const commentData = await Comments.findByPk(req.params.id)
+		const comment = commentData.get({ plain: true })
 		const destroyedComment = await Comments.destroy({ where: { id: req.params.id } })
+		// sockets
+		const io = req.app.get('socketio')
+		io.to(`room-${req.params.articleId}`).emit('comment', { action: 'destroy', data: { comment } })
 		if (destroyedComment > 0) return res.sendStatus(200)
 		res.sendStatus(500)
 	})

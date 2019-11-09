@@ -59,9 +59,9 @@ app.use((error, req, res, next) => {
 })
 
 const server = http.createServer(app)
-
 // WS
-require('./services/socketService')(server, rStore, wsLimiter)
+const io = require('./services/socketService')(server, rStore, wsLimiter)
+app.set('socketio', io)
 
 // Connect to DB and run the server
 db.authenticate()
