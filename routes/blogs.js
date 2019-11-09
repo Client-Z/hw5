@@ -19,6 +19,7 @@ const { combineArticles2Views } = require('../services/helpers')
 const authCheck = require('../services/middlewares/authCheck')
 const { articlesMulter } = require('../services/multer')
 const { gcArticlesIMGRemover } = require('../services/gcRemovalService')
+const Op = require('sequelize').Op
 
 router.get(
 	'/',
@@ -99,11 +100,21 @@ router.delete(
 router.get(
 	'/:id/comments',
 	asyncHandler(async (req, res) => {
-		// need to check if the request has a token for pagination
-		const comments = await Comments.findAll({
-			order: [['createdAt', 'DESC']],
-			include: [{ model: Users, as: 'author', attributes: ['id', 'firstName', 'lastName', 'picture'] }]
-		})
+		let comments = null
+		if (!req.query.after) {
+			comments = await Comments.findAll({
+				limit: 5,
+				order: [['createdAt', 'DESC']],
+				include: [{ model: Users, as: 'author', attributes: ['id', 'firstName', 'lastName', 'picture'] }]
+			})
+		} else {
+			comments = await Comments.findAll({
+				where: { id: { [Op.lt]: +req.query.after } },
+				limit: 5,
+				order: [['createdAt', 'DESC']],
+				include: [{ model: Users, as: 'author', attributes: ['id', 'firstName', 'lastName', 'picture'] }]
+			})
+		}
 		res.send({ data: comments })
 	})
 )
