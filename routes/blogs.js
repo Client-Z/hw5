@@ -96,17 +96,39 @@ router.delete(
 )
 
 // Comments
-/*
-	GET /blog/:articleId/comments
-	POST /blog/:articleId/comments
-	DELETE /blog/:articleId/comments/:id
-*/
-
 router.get(
 	'/:id/comments',
 	asyncHandler(async (req, res) => {
-		const comments = await Comments.findAll({ order: [['createdAt', 'DESC']] })
+		// need to check if the request has a token for pagination
+		const comments = await Comments.findAll({
+			order: [['createdAt', 'DESC']],
+			include: [{ model: Users, as: 'author', attributes: ['id', 'firstName', 'lastName', 'picture'] }]
+		})
 		res.send({ data: comments })
+	})
+)
+
+router.post(
+	'/:id/comments',
+	authCheck,
+	asyncHandler(async (req, res) => {
+		req.body.authorId = req.user.id
+		req.body.articleId = req.params.id
+		const newComment = await Comments.create({ ...req.body })
+		const data = newComment.get({ plain: true })
+		data.author = await Users.findByPk(data.authorId, { attributes: ['id', 'firstName', 'lastName', 'picture'], raw: true })
+		res.send({ data: data })
+	})
+)
+
+router.delete(
+	'/:articleId/comments/:id',
+	authCheck,
+	asyncHandler(async (req, res) => {
+		req.body.id = req.params.id
+		const destroyedComment = await Comments.destroy({ where: { id: req.params.id } })
+		if (destroyedComment > 0) return res.sendStatus(200)
+		res.sendStatus(500)
 	})
 )
 

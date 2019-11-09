@@ -24,7 +24,7 @@ module.exports = (server, rStore, wsLimiter) => {
 		})
 		const ip = socket.request.connection.remoteAddress
 		if (socket.request.user.logged_in) {
-			console.log(socket.request.user.get({ plain: true }), socket.request.user.logged_in)
+			// console.log(socket.request.user.get({ plain: true }), socket.request.user.logged_in)
 			socket.use((packet, next) => {
 				const event = packet[0]
 				console.log({ event })
@@ -37,16 +37,17 @@ module.exports = (server, rStore, wsLimiter) => {
 					.catch(consume => next(new Error('Rate limit error')))
 			})
 
-			socket.on('watch-comments', articleId => {
-				console.log('Joining to room id', articleId)
-				// check permission ?
-				socket.join(`room-${articleId}`, () => {
-					const rooms = Object.keys(socket.rooms)
-					const message = `${socket.request.user.firstName} has joined to room ${articleId}`
-					console.log(message, rooms)
-					io.to(`room-${articleId}`).emit('comment', { action: 'create', data: message })
-				})
-			})
+			// has some problem
+			// socket.on('watch-comments', articleId => {
+			// 	console.log('Joining to room id', articleId)
+			// 	// check permission ?
+			// 	socket.join(`room-${articleId}`, () => {
+			// 		const rooms = Object.keys(socket.rooms)
+			// 		const message = `${socket.request.user.firstName} has joined to room ${articleId}`
+			// 		// console.log(message, rooms)
+			// 		io.to(`room-${articleId}`).emit('comment', { action: 'create', data: message })
+			// 	})
+			// })
 		}
 
 		// socket.on('leave', (roomId) => {
