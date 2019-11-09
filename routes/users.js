@@ -10,12 +10,13 @@ const express = require('express')
 const router = express.Router()
 const asyncHandler = require('express-async-handler')
 
-const { Users, Articles } = require('../db/models/index.js')
+const { Users } = require('../db/models/index.js')
 const db = require('../db/dbConnection')
 
 const { getViews } = require('../mongodb/queries')
 const { combineArticles2Views } = require('../services/helpers')
 const authCheck = require('../services/middlewares/authCheck')
+const { getArticles } = require('../services/queryHelperService')
 
 router.get(
 	'/',
@@ -58,13 +59,7 @@ router.get(
 router.get(
 	'/:id/blog',
 	asyncHandler(async (req, res) => {
-		const articles = await Articles.findAll({
-			where: {
-				authorId: req.params.id
-			},
-			order: [['createdAt', 'DESC']],
-			include: [{ model: Users, as: 'author' }]
-		})
+		const articles = await getArticles(req.query.after)
 		const views = await getViews(req.params.id)
 		combineArticles2Views(articles, views)
 		res.send({ data: articles })

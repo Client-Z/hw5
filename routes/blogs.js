@@ -19,28 +19,13 @@ const { combineArticles2Views } = require('../services/helpers')
 const authCheck = require('../services/middlewares/authCheck')
 const { articlesMulter } = require('../services/multer')
 const { gcArticlesIMGRemover } = require('../services/gcRemovalService')
+const { getArticles } = require('../services/queryHelperService')
 const Op = require('sequelize').Op
 
 router.get(
 	'/',
 	asyncHandler(async (req, res) => {
-		let articles = null
-		if (!req.query.after) {
-			articles = await Articles.findAll({
-				limit: 5,
-				order: [['createdAt', 'DESC']],
-				include: [{ model: Users, as: 'author' }]
-			})
-		} else {
-			let beforeID = req.query.after.indexOf('_')
-			const id = req.query.after.slice(++beforeID)
-			articles = await Articles.findAll({
-				where: { id: { [Op.lt]: +id } },
-				limit: 5,
-				order: [['createdAt', 'DESC']],
-				include: [{ model: Users, as: 'author' }]
-			})
-		}
+		const articles = await getArticles(req.query.after)
 		const views = await getViews()
 		combineArticles2Views(articles, views)
 		res.send({ data: articles })
