@@ -13,10 +13,12 @@ const authCheck = require('../services/middlewares/authCheck')
 const { logOut } = require('../services/helpers')
 const { avatarMulter } = require('../services/multer')
 const { gcUserIMGRemover } = require('../services/gcRemovalService')
+const { editUserValidation } = require('../services/validationService')
 
 router.put(
 	'/',
 	authCheck,
+	editUserValidation,
 	asyncHandler(async (req, res) => {
 		req.user.update({ firstName: req.body.firstName, lastName: req.body.lastName })
 		res.send({ data: req.user })

@@ -12,6 +12,7 @@
 const express = require('express')
 const router = express.Router()
 const asyncHandler = require('express-async-handler')
+const Op = require('sequelize').Op
 
 const { Articles, Users, Comments } = require('../db/models/index.js')
 const { insertView, removeView: removeArticlesView, getView, getViews } = require('../mongodb/queries')
@@ -20,7 +21,7 @@ const authCheck = require('../services/middlewares/authCheck')
 const { articlesMulter } = require('../services/multer')
 const { gcArticlesIMGRemover } = require('../services/gcRemovalService')
 const { getArticles } = require('../services/queryHelperService')
-const Op = require('sequelize').Op
+const { articleValidation, commentValidation } = require('../services/validationService')
 
 router.get(
 	'/',
@@ -34,8 +35,7 @@ router.get(
 
 router.post(
 	'/',
-	authCheck,
-	articlesMulter.single('picture'),
+	[authCheck, articlesMulter.single('picture'), articleValidation],
 	asyncHandler(async (req, res) => {
 		let newArticle = null
 		req.body.authorId = req.user.id
@@ -48,8 +48,7 @@ router.post(
 )
 router.put(
 	'/:id',
-	authCheck,
-	articlesMulter.single('picture'),
+	[authCheck, articlesMulter.single('picture'), articleValidation],
 	asyncHandler(async (req, res) => {
 		const data = await Articles.findByPk(req.params.id, { attributes: ['authorId', 'picture'] })
 		const articleData = data.get({ plain: true })
@@ -86,8 +85,8 @@ router.delete(
 		if (articleData.authorId === req.user.id) {
 			const destroyedArticle = await Articles.destroy({ where: { id: req.params.id } })
 			await removeArticlesView(req.params.id)
-			await gcArticlesIMGRemover.remove(articleData.picture)
-			destroyedArticle > 0 ? res.send({}) : res.sendStatus(500)
+			if (articleData.picture) await gcArticlesIMGRemover.remove(articleData.picture)
+			destroyedArticle > 0 ? res.send({ data: articleData }) : res.sendStatus(500)
 		} else {
 			res.sendStatus(403)
 		}
@@ -123,6 +122,7 @@ router.get(
 router.post(
 	'/:id/comments',
 	authCheck,
+	commentValidation,
 	asyncHandler(async (req, res) => {
 		req.body.authorId = req.user.id
 		req.body.articleId = +req.params.id
