@@ -128,7 +128,7 @@ router.post(
 		req.body.articleId = +req.params.id
 		const newComment = await Comments.create({ ...req.body })
 		const comment = newComment.get({ plain: true })
-		comment.author = await Users.findByPk(comment.authorId, { attributes: ['id', 'firstName', 'lastName', 'picture'], raw: true })
+		comment.author = req.user
 		// sockets
 		const io = req.app.get('socketio')
 		io.to(`room-${req.params.id}`).emit('comment', { action: 'create', data: { comment } })
