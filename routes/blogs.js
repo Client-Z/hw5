@@ -129,13 +129,17 @@ router.delete(
 	authCheck,
 	asyncHandler(async (req, res) => {
 		req.body.id = req.params.id
-		const commentData = await Comments.findByPk(req.params.id)
-		const comment = commentData.get({ plain: true })
-		const destroyedComment = await Comments.destroy({ where: { id: req.params.id } })
-		// sockets
-		const io = req.app.get('socketio')
-		io.to(`room-${req.params.articleId}`).emit('comment', { action: 'destroy', data: { comment } })
-		if (destroyedComment > 0) return res.sendStatus(200)
+		const commentData = await Comments.findByPk(100)
+		if (commentData) {
+			const result = await commentData.destroy()
+			const deletedComment = result.get({ plain: true })
+			if (deletedComment) {
+				// sockets
+				const io = req.app.get('socketio')
+				io.to(`room-${req.params.articleId}`).emit('comment', { action: 'destroy', data: { deletedComment } })
+				return res.sendStatus(200)
+			}
+		}
 		res.sendStatus(500)
 	})
 )
