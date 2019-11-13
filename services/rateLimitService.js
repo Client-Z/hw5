@@ -25,7 +25,7 @@ module.exports = client => {
 	const wsLimiter = new RateLimiterRedis({
 		redis: client,
 		keyPrefix: 'denis:socket:rl:',
-		points: 3,
+		points: 15,
 		duration: 30
 	})
 

@@ -20,7 +20,7 @@ const { combineArticles2Views } = require('../services/helpers')
 const authCheck = require('../services/middlewares/authCheck')
 const { articlesMulter } = require('../services/multer')
 const { gcArticlesIMGRemover } = require('../services/gcRemovalService')
-const { getArticles } = require('../services/queryHelperService')
+const { getArticles, getComments } = require('../services/queryHelperService')
 const { articleValidation, commentValidation } = require('../services/validationService')
 
 router.get(
@@ -99,21 +99,9 @@ router.get(
 	asyncHandler(async (req, res) => {
 		let comments = null
 		if (!req.query.after) {
-			comments = await Comments.findAll({
-				where: { articleId: req.params.id },
-				limit: 5,
-				order: [['createdAt', 'DESC']],
-				include: [{ model: Users, as: 'author', attributes: ['id', 'firstName', 'lastName', 'picture'] }]
-			})
+			comments = await getComments({ articleId: req.params.id })
 		} else {
-			comments = await Comments.findAll({
-				where: {
-					[Op.and]: [{ id: { [Op.lt]: +req.query.after } }, { articleId: req.params.id }]
-				},
-				limit: 5,
-				order: [['createdAt', 'DESC']],
-				include: [{ model: Users, as: 'author', attributes: ['id', 'firstName', 'lastName', 'picture'] }]
-			})
+			comments = await getComments({ [Op.and]: [{ id: { [Op.lt]: +req.query.after } }, { articleId: req.params.id }] })
 		}
 		res.send({ data: comments })
 	})
