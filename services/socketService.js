@@ -20,18 +20,17 @@ module.exports = (server, rStore, wsLimiter) => {
 			if (err) errorLogger.error(`Some problem with socket connection`, { metadata: err })
 		})
 		const ip = socket.request.connection.remoteAddress
+		socket.use((packet, next) => {
+			wsLimiter
+				.consume(ip)
+				.then(consume => next())
+				.catch(consume => next(new Error('Rate limit error')))
+		})
 		if (socket.request.user.logged_in) {
-			socket.use((packet, next) => {
-				wsLimiter
-					.consume(ip)
-					.then(consume => next())
-					.catch(consume => next(new Error('Rate limit error')))
-			})
 			socket.on('watch-comments', articleId => {
-				socket.join(`room-${articleId}`, () => {
-					socket.on('comment-typing', articleId => {
-						socket.to(`room-${articleId}`).emit('comment-typing', { action: 'typing' })
-					})
+				socket.join(`room-${articleId}`)
+				socket.on('comment-typing', articleId => {
+					socket.to(`room-${articleId}`).emit('comment-typing', { action: 'typing' })
 				})
 			})
 			socket.on('unwatch-comments', articleId => socket.leave(`room-${articleId}`))

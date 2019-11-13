@@ -11,7 +11,7 @@ const isPass = value => {
 	return true
 }
 
-const checkCommentLength = value => value.length > 2
+const checkCommentLength = value => value.length >= 2
 
 const userCreationValidation = validation([
 	body('firstName')
