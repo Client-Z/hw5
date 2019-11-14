@@ -10,10 +10,8 @@ class GCRemoverTool {
 		Array.isArray(data) ? this.removeMany(data) : this.removeOne(data)
 	}
 
-	removeMany(urls) {
-		urls.forEach(url => {
-			if (url.picture) this.removeOne(url.picture)
-		})
+	async removeMany(urls) {
+		await Promise.all(urls.map(url => this.removeOne(url.picture)))
 	}
 
 	async removeOne(url) {
