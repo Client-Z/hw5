@@ -9,9 +9,6 @@ module.exports = {
 	},
 
 	down: function(queryInterface, Sequelize) {
-		return queryInterface.removeColumn('articles', 'picture', {
-			type: Sequelize.STRING,
-			allowNull: true
-		})
+		return queryInterface.removeColumn('articles', 'picture')
 	}
 }
