@@ -129,7 +129,7 @@ router.delete(
 	authCheck,
 	asyncHandler(async (req, res) => {
 		req.body.id = req.params.id
-		const commentData = await Comments.findByPk(100)
+		const commentData = await Comments.findByPk(req.params.id)
 		if (commentData) {
 			const result = await commentData.destroy()
 			const deletedComment = result.get({ plain: true })
