@@ -27,13 +27,12 @@ module.exports = (server, rStore, wsLimiter) => {
 				.catch(consume => next(new Error('Rate limit error')))
 		})
 		if (socket.request.user.logged_in) {
-			socket.on('watch-comments', articleId => {
-				socket.join(`room-${articleId}`)
-				socket.on('comment-typing', articleId => {
-					socket.to(`room-${articleId}`).emit('comment-typing', { action: 'typing' })
-				})
-			})
+			socket.on('watch-comments', articleId => socket.join(`room-${articleId}`))
 			socket.on('unwatch-comments', articleId => socket.leave(`room-${articleId}`))
+
+			socket.on('comment-typing', articleId => {
+				socket.to(`room-${articleId}`).emit('comment-typing', { action: 'typing' })
+			})
 		}
 	})
 	return io

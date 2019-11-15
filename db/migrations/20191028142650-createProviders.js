@@ -34,6 +34,6 @@ module.exports = {
 			}
 		),
 	down: (queryInterface, Sequelize) => {
-		queryInterface.dropTable('oauth_accounts')
+		return queryInterface.dropTable('oauth_accounts')
 	}
 }
