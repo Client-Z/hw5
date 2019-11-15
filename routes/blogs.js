@@ -12,7 +12,6 @@
 const express = require('express')
 const router = express.Router()
 const asyncHandler = require('express-async-handler')
-const Op = require('sequelize').Op
 
 const { Articles, Users, Comments } = require('../db/models/index.js')
 const { insertView, removeView: removeArticlesView, getView, getViews } = require('../mongodb/queries')
@@ -97,12 +96,7 @@ router.delete(
 router.get(
 	'/:id/comments',
 	asyncHandler(async (req, res) => {
-		let comments = null
-		if (!req.query.after) {
-			comments = await getComments({ articleId: req.params.id })
-		} else {
-			comments = await getComments({ [Op.and]: [{ id: { [Op.lt]: +req.query.after } }, { articleId: req.params.id }] })
-		}
+		const comments = await getComments(req.params.id, +req.query.after)
 		res.send({ data: comments })
 	})
 )
@@ -114,7 +108,7 @@ router.post(
 	asyncHandler(async (req, res) => {
 		req.body.authorId = req.user.id
 		req.body.articleId = +req.params.id
-		const newComment = await Comments.create({ ...req.body })
+		const newComment = await Comments.create(req.body)
 		const comment = newComment.get({ plain: true })
 		comment.author = req.user
 		// sockets
