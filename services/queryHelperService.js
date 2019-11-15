@@ -1,4 +1,5 @@
 const Op = require('sequelize').Op
+const moment = require('moment')
 const { Articles, Users, Comments } = require('../db/models/index')
 
 const getArticles = async continuation => {
@@ -12,13 +13,8 @@ const getArticles = async continuation => {
 	}
 	if (continuation) {
 		const [timestamp, id] = continuation.split('_')
-		// console.log(id, typeof timestamp)
-		// let beforeID = continuation.indexOf('_')
-		// const id = continuation.slice(++beforeID)
-		// const timestamp = continuation.slice(0, --beforeID)
-		// const publishedAt = moment(timestamp).format('YYYY-MM-DD HH:mm:ss')
-		console.log('timestamp: ', id)
-		return await baseQuery({ id: { [Op.lt]: +id }, publishedAt: { [Op.lte]: timestamp } }) // e
+		const publishedAt = moment(timestamp).format('YYYY-MM-DD HH:mm:ss')
+		return await baseQuery({ id: { [Op.lte]: +id }, publishedAt: { [Op.lt]: publishedAt } }) // timestamp
 	}
 	return await baseQuery()
 }
