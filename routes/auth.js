@@ -12,8 +12,9 @@ const jwt = require('jsonwebtoken')
 
 const { Users } = require('../db/models/index.js')
 require('../services/passportService')(passport)
-const { logOut } = require('../services/helpers')
+const { logOut, getFormattedUrl } = require('../services/helpers')
 const { userCreationValidation, loginValidation } = require('../services/validationService')
+const { sgMail } = require('../services/emailService')
 
 router.post(
 	'/registration',
@@ -31,13 +32,33 @@ router.post(
 				password: req.body.password
 			}
 			const newUser = await Users.create(userItem)
-			req.logIn(newUser.dataValues, function(err) {
-				if (err) return res.status(500).send({ error: err })
+			const createdUser = newUser.get({ plain: true })
+			jwt.sign(createdUser, 'secretkey', { expiresIn: '1h' }, (err, token) => {
+				if (err) return res.sendStatus(403)
+				const verifyLink = `${getFormattedUrl(req)}/verify?token=${token}`
+				sgMail.send({
+					to: createdUser.email,
+					from: 'internship@zazmic.com',
+					template_id: process.env.ACCOUNT_VERIFICATION_TEMPLATE,
+					dynamic_template_data: {
+						verifyLink: verifyLink,
+						name: createdUser.firstName
+					}
+				})
 				res.send({ data: newUser })
 			})
 		}
 	})
 )
+
+router.post('/registration/verify', (req, res) => {
+	jwt.verify(req.body.token, 'secretkey', (error, authData) => {
+		if (error) return res.status(403).json({ errors: [{ msg: 'Try to register again' }] })
+		req.logIn(authData, err => {
+			return err ? res.status(500).send({ error: err }) : res.send({ data: authData })
+		})
+	})
+})
 
 router.post(
 	'/login',
