@@ -1,22 +1,19 @@
 const Op = require('sequelize').Op
-const moment = require('moment')
 const { Articles, Users, Comments } = require('../db/models/index')
 
-const getArticles = async continuation => {
-	const baseQuery = async where => {
-		return await Articles.findAll({
-			where: where,
-			limit: 5,
-			order: [['publishedAt', 'DESC'], ['id', 'ASC']],
-			include: [{ model: Users, as: 'author' }]
-		})
+const getArticles = async (after, authorId) => {
+	let whereObj = {}
+	if (after) {
+		const [timestamp, id] = after.split('_')
+		whereObj = { id: { [Op.lte]: +id }, publishedAt: { [Op.lt]: timestamp } }
 	}
-	if (continuation) {
-		const [timestamp, id] = continuation.split('_')
-		const publishedAt = moment(timestamp).format('YYYY-MM-DD HH:mm:ss')
-		return await baseQuery({ id: { [Op.lte]: +id }, publishedAt: { [Op.lt]: publishedAt } }) // timestamp
-	}
-	return await baseQuery()
+	if (authorId) whereObj.authorId = authorId
+	return await Articles.findAll({
+		where: whereObj,
+		limit: 5,
+		order: [['publishedAt', 'DESC'], ['id', 'ASC']],
+		include: [{ model: Users, as: 'author' }]
+	})
 }
 
 const getComments = async (articleId, continuation) => {
