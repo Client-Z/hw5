@@ -59,7 +59,7 @@ router.get(
 router.get(
 	'/:id/blog',
 	asyncHandler(async (req, res) => {
-		const articles = await getArticles(req.query.after)
+		const articles = await getArticles(req.query.after, req.params.id)
 		const views = await getViews(req.params.id)
 		combineArticles2Views(articles, views)
 		res.send({ data: articles })

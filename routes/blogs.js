@@ -25,7 +25,7 @@ const { articleValidation, commentValidation } = require('../services/validation
 router.get(
 	'/',
 	asyncHandler(async (req, res) => {
-		const articles = await getArticles(req.query.after)
+		const articles = await getArticles(req.query.after, null)
 		const views = await getViews()
 		combineArticles2Views(articles, views)
 		res.send({ data: articles })
