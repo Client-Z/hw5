@@ -47,6 +47,12 @@ Users.init(
 			defaultValue: DataTypes.NOW,
 			allowNull: false,
 			field: 'updated_at'
+		},
+		isVerified: {
+			type: DataTypes.BOOLEAN,
+			defaultValue: 0,
+			allowNull: false,
+			field: 'is_verified'
 		}
 	},
 	{
