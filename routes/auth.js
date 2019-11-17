@@ -54,8 +54,13 @@ router.post(
 router.post('/registration/verify', (req, res) => {
 	jwt.verify(req.body.token, 'secretkey', (error, authData) => {
 		if (error) return res.status(403).json({ errors: [{ msg: 'Try to register again' }] })
-		req.logIn(authData, err => {
-			return err ? res.status(500).send({ error: err }) : res.send({ data: authData })
+		req.logIn(authData, async err => {
+			if (err) {
+				res.status(500).send({ error: err })
+			} else {
+				const updatedData = await Users.update({ isVerified: true }, { where: { id: authData.id } })
+				return updatedData > 0 ? res.send({ data: authData }) : res.sendStatus(500)
+			}
 		})
 	})
 })
