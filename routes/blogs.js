@@ -22,6 +22,8 @@ const { gcArticlesIMGRemover } = require('../services/gcRemovalService')
 const { getArticles, getComments } = require('../services/queryHelperService')
 const { articleValidation, commentValidation } = require('../services/validationService')
 
+require('../services/stripeService')
+
 router.get(
 	'/',
 	asyncHandler(async (req, res) => {
