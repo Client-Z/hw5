@@ -3,7 +3,7 @@ const stripe = require('stripe')(process.env.STRIPE_SK)
 const createCustomer = async () => {
 	const customer = await stripe.customers.create({
 		email: 'denisoleshenko@gmail.com',
-		source: 'tok_visa'
+		source: 'tok_visa' // tok_visa, maybe need the token from frontend
 	})
 	console.log(customer)
 }
