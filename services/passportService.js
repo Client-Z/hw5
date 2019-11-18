@@ -25,6 +25,7 @@ module.exports = passport => {
 			try {
 				const userData = await Users.unscoped().findOne({ where: { email: email } })
 				const user = userData.get({ plain: true })
+				if (!user.isVerified) done({ error: 'You should verify your account. Check your email.' })
 				const match = await checkPsw(password, user.password)
 				if (match) return done(null, user)
 				return done(null, {})

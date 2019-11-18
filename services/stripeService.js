@@ -1,17 +1,13 @@
 const stripe = require('stripe')(process.env.STRIPE_SK)
+const asyncHandler = require('express-async-handler')
 
-const createCustomer = async (token, userObj) => {
+const createCustomer = asyncHandler(async (token, userObj) => {
 	const user = userObj.get({ plain: true })
-	const customer = await stripe.customers.create({
-		email: user.email,
-		source: token
-	})
-	const updated = await userObj.update({ stripe_customer_id: customer.id, stripe_card_id: customer.default_source })
-	if (updated) return updated
-	return null
-}
+	const customer = await stripe.customers.create({ email: user.email, source: token })
+	return await userObj.update({ stripe_customer_id: customer.id, stripe_card_id: customer.default_source })
+})
 
-const createCharge = async (customerID, cardID, amount, email) => {
+const createCharge = asyncHandler(async (customerID, cardID, amount, email) => {
 	const charge = await stripe.charges.create({
 		customer: customerID,
 		amount: amount,
@@ -20,15 +16,15 @@ const createCharge = async (customerID, cardID, amount, email) => {
 		source: cardID
 	})
 	return charge ? charge.receipt_url : null
-}
+})
 
-const getChargesAmount = async customerID => {
+const getChargesAmount = asyncHandler(async customerID => {
 	const charges = await stripe.charges.list({ customer: customerID })
 	let sum = 0
 	charges.data.forEach(item => {
 		sum += item.amount
 	})
 	return sum / 100
-}
+})
 
 module.exports = { createCustomer, createCharge, getChargesAmount }
