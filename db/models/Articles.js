@@ -20,6 +20,10 @@ Articles.init(
 			type: DataTypes.STRING,
 			allowNull: false
 		},
+		picture: {
+			type: DataTypes.STRING,
+			allowNull: true
+		},
 		createdAt: {
 			type: DataTypes.DATE,
 			defaultValue: DataTypes.NOW,

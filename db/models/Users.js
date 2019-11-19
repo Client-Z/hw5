@@ -33,6 +33,9 @@ Users.init(
 			allowNull: false,
 			field: 'password'
 		},
+		picture: {
+			type: DataTypes.STRING
+		},
 		createdAt: {
 			type: DataTypes.DATE,
 			defaultValue: DataTypes.NOW,
