@@ -35,7 +35,7 @@ router.post(
 			const newUser = await Users.create(userItem)
 			const createdUser = newUser.get({ plain: true })
 			jwt.sign(createdUser, 'secretkey', { expiresIn: '1h' }, (err, token) => {
-				if (err) return res.sendStatus(403)
+				if (err) return res.status(403).send({ error: err })
 				const verifyLink = `${getFormattedUrl(req)}/verify?token=${token}`
 				sgMail.send({
 					to: createdUser.email,
