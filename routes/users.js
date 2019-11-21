@@ -30,6 +30,7 @@ router.get(
 				users.first_name AS firstName,
 				users.last_name AS lastName,
 				users.last_name AS lastName,
+				users.is_pro,
 				COUNT(articles.id) AS articlesCount
 			FROM users 
 			LEFT JOIN articles ON articles.author_id = users.id 
