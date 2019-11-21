@@ -10,6 +10,7 @@ const asyncHandler = require('express-async-handler')
 const authCheck = require('../services/middlewares/authCheck')
 const { createCharge, getChargesAmount } = require('../services/stripeService')
 const { sgMail } = require('../services/emailService')
+const emailTemplates = require('../db/constant')
 const totalBill = 100 // the sum needs to become a pro
 
 router.get(
@@ -35,7 +36,7 @@ router.put(
 		sgMail.send({
 			to: user.email,
 			from: 'internship@zazmic.com',
-			template_id: process.env.PAYMENT_TEMPLATE,
+			template_id: emailTemplates.paymentTemplate,
 			dynamic_template_data: {
 				chargeReport: chargeReport,
 				sum: req.body.amount,
@@ -48,7 +49,7 @@ router.put(
 			sgMail.send({
 				to: user.email,
 				from: 'internship@zazmic.com',
-				template_id: process.env.PRO_ACCOUNT_TEMPLATE
+				template_id: emailTemplates.proAccountTemplate
 			})
 		}
 		res.send({ data: { amount: totalBill - total, user: user } })

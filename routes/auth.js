@@ -15,6 +15,7 @@ require('../services/passportService')(passport)
 const { logOut, getFormattedUrl } = require('../services/helpers')
 const { userCreationValidation, loginValidation } = require('../services/validationService')
 const { sgMail } = require('../services/emailService')
+const emailTemplates = require('../db/constant')
 
 router.post(
 	'/registration',
@@ -39,7 +40,7 @@ router.post(
 				sgMail.send({
 					to: createdUser.email,
 					from: 'internship@zazmic.com',
-					template_id: process.env.ACCOUNT_VERIFICATION_TEMPLATE,
+					template_id: emailTemplates.accountVerificationTemplate,
 					dynamic_template_data: {
 						verifyLink: verifyLink,
 						name: createdUser.firstName

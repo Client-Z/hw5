@@ -11,7 +11,7 @@ const createCharge = asyncHandler(async (customerID, cardID, amount, email) => {
 	const charge = await stripe.charges.create({
 		customer: customerID,
 		amount: amount,
-		currency: process.env.CURRENCY,
+		currency: 'usd',
 		description: `Charge Pro for ${email}`,
 		source: cardID
 	})
