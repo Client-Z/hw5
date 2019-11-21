@@ -9,6 +9,7 @@ const router = express.Router()
 const asyncHandler = require('express-async-handler')
 const passport = require('passport')
 const jwt = require('jsonwebtoken')
+const util = require('util')
 
 const { Users } = require('../db/models/index.js')
 require('../services/passportService')(passport)
@@ -53,12 +54,13 @@ router.post(
 )
 
 router.post('/registration/verify', (req, res) => {
-	jwt.verify(req.body.token, 'secretkey', async (error, authData) => {
-		console.log('retistration')
-		if (error) return res.status(403).json({ errors: [{ msg: 'Try to register again' }] })
-		const updatedData = await Users.update({ isVerified: true }, { where: { id: authData.id } })
-		return updatedData > 0 ? res.send({ data: authData }) : res.sendStatus(500)
-	})
+	const jwtVerifyPromise = util.promisify(jwt.verify)
+	jwtVerifyPromise(req.body.token, 'secretkey')
+		.then(async authData => {
+			const updatedData = await Users.update({ isVerified: true }, { where: { id: authData.id } })
+			return updatedData > 0 ? res.send({ data: authData }) : res.sendStatus(500)
+		})
+		.catch(() => res.status(403).json({ errors: [{ msg: 'Try to register again' }] }))
 })
 
 router.post(
