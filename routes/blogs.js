@@ -4,26 +4,28 @@
 	GET /api/v1/blog/:id - get the blog by id
 	PUT /api/v1/blog/:id - update the blog by id
 	DELETE /api/v1/blog/:id - delete the blog by id
+	GET /blog/:articleId/comments - get all comments
+	POST /blog/:articleId/comments - add a new comment
+	DELETE /blog/:articleId/comments/:id - delete the comments
 */
 
 const express = require('express')
 const router = express.Router()
 const asyncHandler = require('express-async-handler')
 
-const { Articles, Users } = require('../db/models/index.js')
+const { Articles, Users, Comments } = require('../db/models/index.js')
 const { insertView, removeView: removeArticlesView, getView, getViews } = require('../mongodb/queries')
 const { combineArticles2Views } = require('../services/helpers')
 const authCheck = require('../services/middlewares/authCheck')
 const { articlesMulter } = require('../services/multer')
 const { gcArticlesIMGRemover } = require('../services/gcRemovalService')
+const { getArticles, getComments } = require('../services/queryHelperService')
+const { articleValidation, commentValidation } = require('../services/validationService')
 
 router.get(
 	'/',
 	asyncHandler(async (req, res) => {
-		const articles = await Articles.findAll({
-			order: [['createdAt', 'DESC']],
-			include: [{ model: Users, as: 'author' }]
-		})
+		const articles = await getArticles(req.query.after, null)
 		const views = await getViews()
 		combineArticles2Views(articles, views)
 		res.send({ data: articles })
@@ -32,8 +34,7 @@ router.get(
 
 router.post(
 	'/',
-	authCheck,
-	articlesMulter.single('picture'),
+	[authCheck, articlesMulter.single('picture'), articleValidation],
 	asyncHandler(async (req, res) => {
 		let newArticle = null
 		req.body.authorId = req.user.id
@@ -46,8 +47,7 @@ router.post(
 )
 router.put(
 	'/:id',
-	authCheck,
-	articlesMulter.single('picture'),
+	[authCheck, articlesMulter.single('picture'), articleValidation],
 	asyncHandler(async (req, res) => {
 		const data = await Articles.findByPk(req.params.id, { attributes: ['authorId', 'picture'] })
 		const articleData = data.get({ plain: true })
@@ -84,11 +84,54 @@ router.delete(
 		if (articleData.authorId === req.user.id) {
 			const destroyedArticle = await Articles.destroy({ where: { id: req.params.id } })
 			await removeArticlesView(req.params.id)
-			await gcArticlesIMGRemover.remove(articleData.picture)
-			destroyedArticle > 0 ? res.send({}) : res.sendStatus(500)
+			if (articleData.picture) await gcArticlesIMGRemover.remove(articleData.picture)
+			destroyedArticle > 0 ? res.send({ data: articleData }) : res.sendStatus(500)
 		} else {
 			res.sendStatus(403)
 		}
 	})
 )
+
+// Comments
+router.get(
+	'/:id/comments',
+	asyncHandler(async (req, res) => {
+		const comments = await getComments(req.params.id, +req.query.after)
+		res.send({ data: comments })
+	})
+)
+
+router.post(
+	'/:id/comments',
+	authCheck,
+	commentValidation,
+	asyncHandler(async (req, res) => {
+		req.body.authorId = req.user.id
+		req.body.articleId = +req.params.id
+		const newComment = await Comments.create(req.body)
+		const comment = newComment.get({ plain: true })
+		comment.author = req.user
+		// sockets
+		const io = req.app.get('socketio')
+		io.to(`room-${req.params.id}`).emit('comment', { action: 'create', data: { comment } })
+		res.send({ data: comment })
+	})
+)
+
+router.delete(
+	'/:articleId/comments/:id',
+	authCheck,
+	asyncHandler(async (req, res) => {
+		req.body.id = req.params.id
+		const commentData = await Comments.findByPk(req.params.id)
+		if (commentData) {
+			await commentData.destroy()
+			const io = req.app.get('socketio')
+			io.to(`room-${req.params.articleId}`).emit('comment', { action: 'destroy', data: { commentData } })
+			return res.sendStatus(200)
+		}
+		res.sendStatus(404)
+	})
+)
+
 module.exports = router

@@ -13,10 +13,12 @@ const authCheck = require('../services/middlewares/authCheck')
 const { logOut } = require('../services/helpers')
 const { avatarMulter } = require('../services/multer')
 const { gcUserIMGRemover } = require('../services/gcRemovalService')
+const { editUserValidation } = require('../services/validationService')
 
 router.put(
 	'/',
 	authCheck,
+	editUserValidation,
 	asyncHandler(async (req, res) => {
 		req.user.update({ firstName: req.body.firstName, lastName: req.body.lastName })
 		res.send({ data: req.user })
@@ -28,8 +30,8 @@ router.delete(
 	authCheck,
 	asyncHandler(async (req, res) => {
 		const imgs = await Articles.findAll({ where: { authorId: req.user.id }, raw: true, attributes: ['picture'] })
-		imgs.push({ picture: req.user.picture })
-		await gcUserIMGRemover.remove(imgs)
+		if (req.user.picture) imgs.push({ picture: req.user.picture })
+		if (imgs.length) await gcUserIMGRemover.remove(imgs)
 		const destroyedUser = await Users.destroy({ where: { id: req.user.id } })
 		if (destroyedUser > 0) return logOut(req, res)
 		res.sendStatus(500)

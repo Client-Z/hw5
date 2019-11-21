@@ -63,17 +63,9 @@ Users.init(
 )
 
 Users.associate = models => {
-	Users.hasMany(models.Articles, {
-		as: 'articles',
-		foreignKey: 'authorId'
-	})
-}
-
-Users.associate = models => {
-	Users.hasMany(models.Providers, {
-		as: 'oauth_accounts',
-		foreignKey: 'userId'
-	})
+	Users.hasMany(models.Articles, { as: 'articles', foreignKey: 'authorId' })
+	Users.hasMany(models.Providers, { as: 'oauth_accounts', foreignKey: 'userId' })
+	Users.hasMany(models.Comments, { as: 'comments', foreignKey: 'authorId' })
 }
 
 module.exports = Users

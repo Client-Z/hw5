@@ -1,7 +1,8 @@
 const models = {
 	Users: require('./Users'),
 	Articles: require('./Articles'),
-	Providers: require('./Providers')
+	Providers: require('./Providers'),
+	Comments: require('./Comments')
 }
 
 const modelNames = Object.keys(models)

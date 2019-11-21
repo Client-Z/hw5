@@ -13,9 +13,11 @@ const jwt = require('jsonwebtoken')
 const { Users } = require('../db/models/index.js')
 require('../services/passportService')(passport)
 const { logOut } = require('../services/helpers')
+const { userCreationValidation, loginValidation } = require('../services/validationService')
 
 router.post(
 	'/registration',
+	userCreationValidation,
 	asyncHandler(async (req, res) => {
 		const userData = await Users.findOne({ where: { email: req.body.email } })
 		if (userData) {
@@ -39,6 +41,7 @@ router.post(
 
 router.post(
 	'/login',
+	loginValidation,
 	passport.authenticate('local', {
 		failureRedirect: '/login'
 	}),
