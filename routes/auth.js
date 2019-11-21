@@ -9,7 +9,6 @@ const router = express.Router()
 const asyncHandler = require('express-async-handler')
 const passport = require('passport')
 const jwt = require('jsonwebtoken')
-const util = require('util')
 
 const { Users } = require('../db/models/index.js')
 require('../services/passportService')(passport)
@@ -35,7 +34,7 @@ router.post(
 			}
 			const newUser = await Users.create(userItem)
 			const createdUser = newUser.get({ plain: true })
-			jwt.sign(createdUser, 'secretkey', { expiresIn: '1h' }, (err, token) => {
+			jwt.sign({ uid: createdUser.id }, 'secretkey', { expiresIn: '1h' }, (err, token) => {
 				if (err) return res.status(403).send({ error: err })
 				const verifyLink = `${getFormattedUrl(req)}/verify?token=${token}`
 				sgMail.send({
@@ -53,15 +52,23 @@ router.post(
 	})
 )
 
-router.post('/registration/verify', (req, res) => {
-	const jwtVerifyPromise = util.promisify(jwt.verify)
-	jwtVerifyPromise(req.body.token, 'secretkey')
-		.then(async authData => {
-			const updatedData = await Users.update({ isVerified: true }, { where: { id: authData.id } })
-			return updatedData > 0 ? res.send({ data: authData }) : res.sendStatus(500)
-		})
-		.catch(() => res.status(403).json({ errors: [{ msg: 'Try to register again' }] }))
-})
+router.post(
+	'/registration/verify',
+	asyncHandler(async (req, res) => {
+		try {
+			let token = await jwt.verify(req.body.token, 'secretkey')
+			const userData = await Users.findByPk(token.uid)
+			await userData.update({ isVerified: true })
+			let user = userData.get({ plain: true })
+			req.logIn(user, err => {
+				if (err) res.status(500).send({ error: err })
+			})
+			res.send({ data: user })
+		} catch (e) {
+			return res.status(403).json({ errors: [{ msg: 'Try to register again' }] })
+		}
+	})
+)
 
 router.post(
 	'/login',
