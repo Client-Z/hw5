@@ -125,16 +125,12 @@ router.delete(
 		req.body.id = req.params.id
 		const commentData = await Comments.findByPk(req.params.id)
 		if (commentData) {
-			const result = await commentData.destroy()
-			const deletedComment = result.get({ plain: true })
-			if (deletedComment) {
-				// sockets
-				const io = req.app.get('socketio')
-				io.to(`room-${req.params.articleId}`).emit('comment', { action: 'destroy', data: { deletedComment } })
-				return res.sendStatus(200)
-			}
+			await commentData.destroy()
+			const io = req.app.get('socketio')
+			io.to(`room-${req.params.articleId}`).emit('comment', { action: 'destroy', data: { commentData } })
+			return res.sendStatus(200)
 		}
-		res.sendStatus(500)
+		res.sendStatus(404)
 	})
 )
 
