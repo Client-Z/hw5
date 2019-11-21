@@ -1,10 +1,14 @@
 const stripe = require('stripe')(process.env.STRIPE_SK)
 const asyncHandler = require('express-async-handler')
+const { Users } = require('../db/models/index')
 
-const createCustomer = asyncHandler(async (token, userObj) => {
-	const user = userObj.get({ plain: true })
+const createCustomer = asyncHandler(async (token, user) => {
 	const customer = await stripe.customers.create({ email: user.email, source: token })
-	return await userObj.update({ stripe_customer_id: customer.id, stripe_card_id: customer.default_source })
+	const updated = await Users.update(
+		{ stripe_customer_id: customer.id, stripe_card_id: customer.default_source },
+		{ where: { id: user.id } }
+	)
+	return updated ? { stripe_customer_id: customer.id, stripe_card_id: customer.default_source } : null
 })
 
 const createCharge = asyncHandler(async (customerID, cardID, amount, email) => {

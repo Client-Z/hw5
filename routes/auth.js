@@ -52,23 +52,20 @@ router.post(
 	})
 )
 
-router.post(
-	'/registration/verify',
-	asyncHandler(async (req, res) => {
-		try {
-			let token = await jwt.verify(req.body.token, 'secretkey')
-			const userData = await Users.findByPk(token.uid)
-			await userData.update({ isVerified: true })
-			let user = userData.get({ plain: true })
-			req.logIn(user, err => {
-				if (err) res.status(500).send({ error: err })
-			})
-			res.send({ data: user })
-		} catch (e) {
-			return res.status(403).json({ errors: [{ msg: 'Try to register again' }] })
-		}
-	})
-)
+router.post('/registration/verify', async (req, res) => {
+	try {
+		let token = await jwt.verify(req.body.token, 'secretkey')
+		const userData = await Users.findByPk(token.uid)
+		await userData.update({ isVerified: true })
+		let user = userData.get({ plain: true })
+		req.logIn(user, err => {
+			if (err) res.status(500).send({ error: err })
+		})
+		res.send({ data: user })
+	} catch (e) {
+		return res.status(403).json({ errors: [{ msg: 'Try to register again' }] })
+	}
+})
 
 router.post(
 	'/login',

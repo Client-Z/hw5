@@ -54,9 +54,9 @@ router.put(
 	'/card',
 	authCheck,
 	asyncHandler(async (req, res) => {
-		const userObj = await createCustomer(req.body.token, req.user)
-		let user = userObj.get({ plain: true })
-		res.send({ data: user })
+		const user = req.user.get({ plain: true })
+		const updatedData = await createCustomer(req.body.token, user)
+		res.send({ data: { ...user, ...updatedData } })
 	})
 )
 
