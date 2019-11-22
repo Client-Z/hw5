@@ -57,4 +57,4 @@ workflows:
             - build
           filters:
             branches:
-              only: develop # master
+              only: feature/hw-12 # master, develop
