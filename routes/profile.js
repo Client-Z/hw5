@@ -14,13 +14,14 @@ const { logOut } = require('../services/helpers')
 const { avatarMulter } = require('../services/multer')
 const { gcUserIMGRemover } = require('../services/gcRemovalService')
 const { editUserValidation } = require('../services/validationService')
+const { createCustomer } = require('../services/stripeService')
 
 router.put(
 	'/',
 	authCheck,
 	editUserValidation,
 	asyncHandler(async (req, res) => {
-		req.user.update({ firstName: req.body.firstName, lastName: req.body.lastName })
+		await req.user.update({ firstName: req.body.firstName, lastName: req.body.lastName })
 		res.send({ data: req.user })
 	})
 )
@@ -46,6 +47,16 @@ router.put(
 		if (!req.file) return res.status(400).send('No file uploaded.')
 		await req.user.update({ picture: req.file.path })
 		res.send({ data: { picture: req.file.path } })
+	})
+)
+
+router.put(
+	'/card',
+	authCheck,
+	asyncHandler(async (req, res) => {
+		const user = req.user.get({ plain: true })
+		const updatedData = await createCustomer(req.body.token, user)
+		res.send({ data: { ...user, ...updatedData } })
 	})
 )
 

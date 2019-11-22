@@ -6,12 +6,14 @@ class AuthService {
 		try {
 			const userData = await Users.findOne({ where: { email } })
 			if (userData) {
+				await userData.update({ isVerified: true })
 				const user = userData.get({ plain: true })
 				const hasAccount = await Providers.findOne({ where: { providerUserId } })
 				if (!hasAccount) await this.createOauthAccount(user.id, provider, providerUserId)
 				return user
 			} else {
 				const newUser = await this.createUser(firstName, lastName, email)
+				await newUser.update({ isVerified: true })
 				await this.createOauthAccount(newUser.dataValues.id, provider, providerUserId)
 				return newUser.get({ plain: true })
 			}
@@ -25,7 +27,7 @@ class AuthService {
 	}
 
 	static async createUser(firstName, lastName, email) {
-		return await Users.create({ firstName, lastName, email, password: '' })
+		return await Users.create({ firstName, lastName, email, password: '123qwe' })
 	}
 }
 
