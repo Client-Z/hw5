@@ -47,6 +47,30 @@ Users.init(
 			defaultValue: DataTypes.NOW,
 			allowNull: false,
 			field: 'updated_at'
+		},
+		isVerified: {
+			type: DataTypes.BOOLEAN,
+			defaultValue: 0,
+			allowNull: false,
+			field: 'is_verified'
+		},
+		is_pro: {
+			type: DataTypes.BOOLEAN,
+			defaultValue: 0,
+			allowNull: false,
+			field: 'is_pro'
+		},
+		stripe_customer_id: {
+			type: DataTypes.BOOLEAN,
+			defaultValue: null,
+			allowNull: true,
+			field: 'stripe_customer_id'
+		},
+		stripe_card_id: {
+			type: DataTypes.BOOLEAN,
+			defaultValue: null,
+			allowNull: true,
+			field: 'stripe_card_id'
 		}
 	},
 	{

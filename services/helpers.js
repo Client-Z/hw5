@@ -1,3 +1,5 @@
+const url = require('url')
+
 const combineArticles2Views = (articles, views) => {
 	articles.forEach(item => {
 		views.forEach(view => {
@@ -12,4 +14,6 @@ const logOut = (req, res) => {
 	res.send({})
 }
 
-module.exports = { combineArticles2Views, logOut }
+const getFormattedUrl = req => url.format({ protocol: req.protocol, host: req.get('host') })
+
+module.exports = { combineArticles2Views, logOut, getFormattedUrl }
