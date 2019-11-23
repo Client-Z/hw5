@@ -1,6 +1,6 @@
 components:
   schemas:
-    Comment:
+    Comments:
       type: object
       properties:
         id:

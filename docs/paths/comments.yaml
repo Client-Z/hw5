@@ -1,0 +1,84 @@
+paths:
+  /api/v1/blog/{blogId}/comments:
+    get:
+      tags:
+        - Comments
+      summary: Get all comments of a post
+      parameters:
+        - name: blogId
+          in: path
+          required: true
+      description: Get all comments of a post
+      responses:
+        200:
+          description: Comments response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: '#/components/schemas/ArrayOfComments'
+        500:
+          $ref: '#/components/responses/InternalError'
+    post:
+      tags:
+        - Comments
+      summary: Create a new comment
+      parameters:
+        - name: blogId
+          in: path
+          required: true
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                content:
+                  type: string
+              required:
+                - content
+      responses:
+        200:
+          description: Created comment
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: '#/components/schemas/Comments'
+        401:
+          $ref: '#/components/responses/Unauthorized'
+        403:
+          $ref: '#/components/responses/Forbidden'
+        500:
+          $ref: '#/components/responses/InternalError'
+  /api/v1/blog/{blogId}/comments/{commentId}:
+    delete:
+      tags:
+        - Comments
+      summary: Delete a comment by id
+      parameters:
+        - name: blogId
+          in: path
+          required: true
+        - name: commentId
+          in: path
+          required: true
+      description: Delete a post by id
+      responses:
+        200:
+          description: Comment response
+          content:
+            application/json:
+              schema:
+                type: object
+        401:
+          $ref: '#/components/responses/Unauthorized'
+        403:
+          $ref: '#/components/responses/Forbidden'
+        500:
+          $ref: '#/components/responses/InternalError'

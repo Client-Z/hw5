@@ -20,10 +20,139 @@ paths:
                 properties:
                   data:
                     $ref: '#/components/schemas/ArrayOfArticles'
-        # 500:
-        #   $ref: '#/components/responses/InternalError'
-    # post:
-    #   tags:
-    #     - Articles
-    #   summary: Create a new article
-    #   requestBody:
+        500:
+          $ref: '#/components/responses/InternalError'
+    post:
+      tags:
+        - Articles
+      summary: Create a new article
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                title:
+                  type: string
+                picture:
+                  type: string
+                  format: binary
+                content:
+                  type: string
+                publishedAt:
+                  type: string
+                  format: date-time
+              required:
+                - title
+                - content
+                - publishedAt
+      responses:
+        200:
+          description: Created article
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: '#/components/schemas/Article'
+        401:
+          $ref: '#/components/responses/Unauthorized'
+        403:
+          $ref: '#/components/responses/Forbidden'
+        500:
+          $ref: '#/components/responses/InternalError'
+  /api/v1/blog/{blogId}:
+    put:
+      tags:
+        - Articles
+      summary: Change a blog by id
+      parameters:
+        - name: blogId
+          in: path
+          required: true
+      description: Change a post by id
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                title:
+                  type: string
+                picture:
+                  type: string
+                  format: binary
+                content:
+                  type: string
+                publishedAt:
+                  type: string
+                  format: date-time
+              required:
+                - title
+                - content
+                - publishedAt
+      responses:
+        200:
+          description: Created article
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+        401:
+          $ref: '#/components/responses/Unauthorized'
+        403:
+          $ref: '#/components/responses/Forbidden'
+        500:
+          $ref: '#/components/responses/InternalError'
+    get:
+      tags:
+        - Articles
+      summary: Get a blog by id
+      parameters:
+        - name: blogId
+          in: path
+          required: true
+      description: Get a post by id
+      responses:
+        200:
+          description: Blog response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: '#/components/schemas/Article'
+        500:
+          $ref: '#/components/responses/InternalError'
+    delete:
+      tags:
+        - Articles
+      summary: Delete a blog by id
+      parameters:
+        - name: blogId
+          in: path
+          required: true
+      description: Delete a post by id
+      responses:
+        200:
+          description: Blog response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: '#/components/schemas/Article'
+        401:
+          $ref: '#/components/responses/Unauthorized'
+        403:
+          $ref: '#/components/responses/Forbidden'
+        500:
+          $ref: '#/components/responses/InternalError'

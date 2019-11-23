@@ -17,9 +17,6 @@ const swaggerUiOptions = {
 	customCss: '.swagger-ui .toolbar { display: none }',
 	swaggerOptions: {
 		filter: true
-		// requestInterseptor: (req) => {
-		// 	const regex = /
-		// }
 	}
 }
 

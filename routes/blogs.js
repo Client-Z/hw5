@@ -123,11 +123,11 @@ router.delete(
 	authCheck,
 	asyncHandler(async (req, res) => {
 		req.body.id = req.params.id
-		const commentData = await Comments.findByPk(req.params.id)
-		if (commentData) {
-			await commentData.destroy()
+		const comment = await Comments.findByPk(req.params.id)
+		if (comment) {
+			await comment.destroy()
 			const io = req.app.get('socketio')
-			io.to(`room-${req.params.articleId}`).emit('comment', { action: 'destroy', data: { commentData } })
+			io.to(`room-${req.params.articleId}`).emit('comment', { action: 'destroy', data: { comment } })
 			return res.sendStatus(200)
 		}
 		res.sendStatus(404)
