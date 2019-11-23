@@ -1,0 +1,27 @@
+paths:
+  /api/v1/users:
+    get:
+      tags:
+        - Users
+      summary: Get users list
+      responses:
+        200:
+          description: Users response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: '#/components/schemas/ArrayOfUsers'
+  # /api/v1/users/{userId}:
+  #   get:
+  #     tags:
+  #       - Users
+  #     summary: Get user by id
+  #     parameters:
+  #       - name: userId
+  #       in: path
+  #       required: true
+  #       description: The ID of the user to return
+  #       schema:

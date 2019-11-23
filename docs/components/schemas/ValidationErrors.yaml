@@ -1,0 +1,7 @@
+components:
+  schemas:
+    ValidationErrors:
+      type: object
+      properties:
+        errors:
+          type: array

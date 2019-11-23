@@ -1,0 +1,29 @@
+paths:
+  /api/v1/blog:
+    get:
+      tags:
+        - Articles
+      summary: Get articles list
+      parameters:
+        - in: query
+          name: after
+      description: Continuation token
+      schema:
+        type: object
+      responses:
+        200:
+          description: Articles list
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: '#/components/schemas/ArrayOfArticles'
+        # 500:
+        #   $ref: '#/components/responses/InternalError'
+    # post:
+    #   tags:
+    #     - Articles
+    #   summary: Create a new article
+    #   requestBody:

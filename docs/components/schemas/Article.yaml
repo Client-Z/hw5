@@ -1,0 +1,26 @@
+components:
+  schemas:
+    Article:
+      type: object
+      properties:
+        id:
+          type: integer
+          description: Articles ID.
+        title:
+          type: string
+        content:
+          type: string
+        picture:
+          type: string
+        authorId:
+          type: integer
+        author:
+          $ref: '#/components/schemas/User'
+        views:
+          type: integer
+        updatedAt:
+          type: string
+          format: date-time
+        createdAt:
+          type: string
+          format: date-time

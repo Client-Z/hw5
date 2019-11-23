@@ -1,0 +1,16 @@
+components:
+  responses:
+    NotFound:
+      description: The specified resource was not found
+    Unauthorized:
+      description: Unauthorized
+    Forbidden:
+      description: Forbidden
+    UnprocessableEntity:
+      description: Unprocessable Entity
+      schema:
+        $ref: '#/components/schemas/ValidationErrors'
+    InternalError:
+      description: Unexpected server error
+      schema:
+        $ref: '#/components/schemas/Error'

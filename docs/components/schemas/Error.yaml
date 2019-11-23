@@ -1,0 +1,7 @@
+components:
+  schemas:
+    Error:
+      type: object
+      properties:
+        data:
+          type: object

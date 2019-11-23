@@ -43,6 +43,9 @@ app.use('/api/v1/users', limiter)
 app.use('/api/v1/profile', limiter)
 app.use('/api/v1/login', loginLimiter)
 
+// docs
+require('./docs/swagger-config')(app)
+
 // routes
 const routes = require('./routes')
 app.use(routes)

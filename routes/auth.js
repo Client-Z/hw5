@@ -1,5 +1,6 @@
 /*
 	POST /api/v1/registration
+	POST /api/v1/registration/verify
 	POST /api/v1/login
 	POST /api/v1/logout
 */
@@ -24,7 +25,7 @@ router.post(
 		const userData = await Users.findOne({ where: { email: req.body.email } })
 		if (userData) {
 			res.status(500)
-			res.send('{ error: "User with this email already exist" }').end()
+			res.send('{ error: "User with this email already exist"}').end()
 		} else {
 			const userItem = {
 				firstName: req.body.firstName,

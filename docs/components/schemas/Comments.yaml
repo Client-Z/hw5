@@ -1,0 +1,17 @@
+components:
+  schemas:
+    Comment:
+      type: object
+      properties:
+        id:
+          type: integer
+          description: Articles ID.
+        content:
+          type: string
+        authorId:
+          type: integer
+        articleId:
+          type: integer
+        createdAt:
+          type: string
+          format: date-time
