@@ -7,7 +7,8 @@
 		"test": "echo \"Error: no test specified\" && exit 1",
 		"dev": "nodemon -r dotenv/config index.js",
 		"history": "node -r dotenv/config ./extra_task/articlesHistory.js",
-		"lint": "eslint ."
+		"lint": "eslint .",
+		"migrations": "npx sequelize-cli db:migrate"
 	},
 	"keywords": [],
 	"author": "",
