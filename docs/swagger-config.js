@@ -15,9 +15,7 @@ const swaggerDefinition = {
 
 const swaggerUiOptions = {
 	customCss: '.swagger-ui .toolbar { display: none }',
-	swaggerOptions: {
-		filter: true
-	}
+	swaggerOptions: { filter: true }
 }
 
 module.exports = app => {
