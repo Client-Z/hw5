@@ -1,0 +1,47 @@
+paths:
+  /api/v1/google/callback/{code}:
+    post:
+      tags:
+        - OAuth
+      summary: Login with google
+      parameters:
+        - name: code
+          in: path
+          required: true
+      responses:
+        200:
+          description: Logged in user via google
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: '#/components/schemas/User'
+        404:
+          $ref: '#/components/responses/NotFound'
+        500:
+          $ref: '#/components/responses/InternalError'
+  /api/v1/facebook/callback/{code}:
+    post:
+      tags:
+        - OAuth
+      summary: Login with facebook
+      parameters:
+        - name: code
+          in: path
+          required: true
+      responses:
+        200:
+          description: Logged in user via facebook
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: '#/components/schemas/User'
+        404:
+          $ref: '#/components/responses/NotFound'
+        500:
+          $ref: '#/components/responses/InternalError'

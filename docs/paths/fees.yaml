@@ -1,0 +1,63 @@
+paths:
+  /api/v1/fees:
+    get:
+      tags:
+        - Fees
+      summary: Get amount of fees
+      description: Get amount of fees
+      responses:
+        200:
+          description: The amount of fees response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      amount:
+                        type: integer
+        401:
+          $ref: '#/components/responses/Unauthorized'
+        403:
+          $ref: '#/components/responses/Forbidden'
+        500:
+          $ref: '#/components/responses/InternalError'
+    put:
+      tags:
+        - Fees
+      summary: Make a pay
+      description: Pay to become a pro
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                amount:
+                  type: string
+              required:
+                - amount
+      responses:
+        200:
+          description: The amount of fees response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      amount:
+                        type: integer
+                      user:
+                        $ref: '#/components/schemas/User'
+        401:
+          $ref: '#/components/responses/Unauthorized'
+        403:
+          $ref: '#/components/responses/Forbidden'
+        500:
+          $ref: '#/components/responses/InternalError'
