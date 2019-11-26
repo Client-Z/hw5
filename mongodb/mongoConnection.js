@@ -14,3 +14,5 @@ class MDatabase {
 	}
 }
 MDatabase.connect()
+
+module.exports = MDatabase

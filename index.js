@@ -75,3 +75,5 @@ db.authenticate()
 		})
 	})
 	.catch(err => errorLogger.error(`Some problem with MySQL connection`, { metadata: err }))
+
+module.exports = app
