@@ -14,14 +14,47 @@ paths:
                 properties:
                   data:
                     $ref: '#/components/schemas/ArrayOfUsers'
-  # /api/v1/users/{userId}:
-  #   get:
-  #     tags:
-  #       - Users
-  #     summary: Get user by id
-  #     parameters:
-  #       - name: userId
-  #       in: path
-  #       required: true
-  #       description: The ID of the user to return
-  #       schema:
+  /api/v1/users/{userId}:
+    get:
+      tags:
+        - Users
+      summary: Get user by id
+      parameters:
+        - name: userId
+          in: path
+          required: true
+      description: Returns user by id
+      responses:
+        200:
+          description: Users response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: '#/components/schemas/User'
+        500:
+          $ref: '#/components/responses/InternalError'
+  /api/v1/users/{userId}/blog:
+    get:
+      tags:
+        - Users
+      summary: Get users posts
+      parameters:
+        - name: userId
+          in: path
+          required: true
+      description: Returns users posts
+      responses:
+        200:
+          description: Users response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: '#/components/schemas/ArrayOfArticles'
+        500:
+          $ref: '#/components/responses/InternalError'
