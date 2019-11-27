@@ -14,7 +14,6 @@ describe('it should test user logout', () => {
 	beforeAll(async () => {
 		user = await registerUser()
 	})
-
 	it('should log out user', async () => {
 		const logOutSpy = jest.spyOn(helperService, 'logOut')
 		await request

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<coverage generated="1574856856082" clover="3.2.0">
-  <project timestamp="1574856856083" name="All files">
+<coverage generated="1574859376314" clover="3.2.0">
+  <project timestamp="1574859376314" name="All files">
     <metrics statements="629" coveredstatements="377" conditionals="112" coveredconditionals="17" methods="117" coveredmethods="28" elements="858" coveredelements="422" complexity="0" loc="629" ncloc="629" packages="9" files="36" classes="36"/>
     <package name="hw5">
       <metrics statements="43" coveredstatements="37" conditionals="4" coveredconditionals="1" methods="5" coveredmethods="2"/>
@@ -123,9 +123,9 @@
         <line num="1" count="1" type="stmt"/>
         <line num="5" count="1" type="stmt"/>
         <line num="6" count="1" type="stmt"/>
-        <line num="12" count="0" type="stmt"/>
-        <line num="16" count="1" type="stmt"/>
-        <line num="18" count="1" type="stmt"/>
+        <line num="11" count="0" type="stmt"/>
+        <line num="15" count="1" type="stmt"/>
+        <line num="17" count="1" type="stmt"/>
       </file>
       <file name="queries.js" path="/home/denis/Zazmic_Internship/hw5/mongodb/queries.js">
         <metrics statements="32" coveredstatements="9" conditionals="0" coveredconditionals="0" methods="6" coveredmethods="1"/>

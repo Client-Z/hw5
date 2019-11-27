@@ -8,7 +8,7 @@
 		"history": "node -r dotenv/config ./extra_task/articlesHistory.js",
 		"lint": "eslint .",
 		"migrations": "npx sequelize-cli db:migrate",
-		"test": "jest --runInBand --forceExit --coverage",
+		"test": "jest --runInBand --forceExit --coverage --verbose false",
 		"test:watch": "jest --watch"
 	},
 	"keywords": [],
