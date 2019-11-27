@@ -1,7 +1,7 @@
 /* eslint-disable */
 
 class Storage {
-	constructor() {
+	constructor(bucket = 'bucket') {
 		this.bucket = jest.fn(() => {})
 	}
 	bucket() {
