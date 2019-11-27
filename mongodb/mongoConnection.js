@@ -5,8 +5,7 @@ class MDatabase {
 		try {
 			return mongoose.connect(process.env.CONNECTION_STR, {
 				useNewUrlParser: true,
-				useUnifiedTopology: true,
-				replicaSet: 'mentorship-shard-0'
+				useUnifiedTopology: true
 			})
 		} catch (e) {
 			throw e
