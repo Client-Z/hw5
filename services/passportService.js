@@ -61,6 +61,7 @@ module.exports = passport => {
 	)
 
 	passport.use(
+		'facebook-strategy',
 		new FacebookStrategy(
 			{
 				clientID: process.env.FACEBOOK_CLIENT_ID,

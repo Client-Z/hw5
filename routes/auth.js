@@ -15,7 +15,7 @@ const { Users } = require('../db/models/index.js')
 require('../services/passportService')(passport)
 const { logOut, getFormattedUrl } = require('../services/helpers')
 const { userCreationValidation, loginValidation } = require('../services/validationService')
-const { sgMail } = require('../services/emailService')
+const { SendgridService } = require('../services/emailService')
 const emailTemplates = require('../db/constant')
 
 router.post(
@@ -35,17 +35,12 @@ router.post(
 			}
 			const newUser = await Users.create(userItem)
 			const createdUser = newUser.get({ plain: true })
-			jwt.sign({ uid: createdUser.id }, 'secretkey', { expiresIn: '1h' }, (err, token) => {
+			jwt.sign({ uid: createdUser.id }, 'secretkey', { expiresIn: '1h' }, async (err, token) => {
 				if (err) return res.status(403).send({ error: err })
 				const verifyLink = `${getFormattedUrl(req)}/verify?token=${token}`
-				sgMail.send({
-					to: createdUser.email,
-					from: 'internship@zazmic.com',
-					template_id: emailTemplates.accountVerificationTemplate,
-					dynamic_template_data: {
-						verifyLink: verifyLink,
-						name: createdUser.firstName
-					}
+				await SendgridService.sendEmail(createdUser.email, 'internship@zazmic.com', emailTemplates.accountVerificationTemplate, {
+					verifyLink: verifyLink,
+					name: createdUser.firstName
 				})
 				res.send({ data: newUser })
 			})

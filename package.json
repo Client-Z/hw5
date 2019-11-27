@@ -9,12 +9,13 @@
 		"lint": "eslint .",
 		"migrations": "npx sequelize-cli db:migrate",
 		"test": "jest --runInBand --forceExit --coverage",
-		"test:watch": "-r dotenv/config jest --watch"
+		"test:watch": "jest --watch"
 	},
 	"keywords": [],
 	"author": "",
 	"license": "ISC",
 	"devDependencies": {
+		"@types/jest": "^24.0.23",
 		"eslint": "^6.5.1",
 		"eslint-config-standart": "^0.2.0",
 		"eslint-plugin-import": "^2.18.2",
@@ -22,13 +23,13 @@
 		"eslint-plugin-prettier": "^3.1.1",
 		"eslint-plugin-promise": "^4.2.1",
 		"eslint-plugin-standard": "^4.0.1",
+		"faker": "^4.1.0",
 		"husky": "^3.0.8",
 		"nodemon": "^1.19.3"
 	},
 	"dependencies": {
 		"@google-cloud/storage": "^4.1.0",
 		"@sendgrid/mail": "^6.4.0",
-		"@types/jest": "^24.0.23",
 		"bcrypt": "^3.0.6",
 		"connect-flash": "^0.1.1",
 		"connect-redis": "^4.0.3",
