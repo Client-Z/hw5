@@ -5,13 +5,16 @@ const getArticles = async (after, authorId) => {
 	let whereObj = {}
 	if (after) {
 		const [timestamp, id] = after.split('_')
-		whereObj = { id: { [Op.lte]: +id }, publishedAt: { [Op.lt]: timestamp } }
+		whereObj = { id: { [Op.gt]: +id }, publishedAt: { [Op.lte]: timestamp } }
 	}
 	if (authorId) whereObj.authorId = authorId
 	return await Articles.findAll({
 		where: whereObj,
 		limit: 5,
-		order: [['publishedAt', 'DESC'], ['id', 'ASC']],
+		order: [
+			['publishedAt', 'DESC'],
+			['id', 'ASC']
+		],
 		include: [{ model: Users, as: 'author' }]
 	})
 }
